@@ -1,9 +1,57 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="backgroundHome">
+    <div class="background2">
+    <div class="searchBar">
+        <input type="search" id="search" name="Search">
+        <button id="searchButton">Search</button><br />
+            <label for="From" id="label1" style="color:white; opacity:0;">From:</label> 
+            <label for="To" id="label2" style="color:white; margin-left:140px;opacity:0;">To:</label> <br />
+
+            <input type="datetime-local"
+                    id="additional1" name="Additional" style="opacity:0" value="From"/>
+            
+            <input type="datetime-local"
+                   id="additional2" name="Additional" style="opacity:0" value="To"/>
+    </div>
+    </div>
+
+    <div class="bilder">
+    <div class="slide-container">
+        <span class="slider-span" id="slider-span1"></span>
+        <span class="slider-span" id="slider-span2"></span>
+        <span class="slider-span" id="slider-span3"></span>
+        <span class="slider-span" id="slider-span4"></span>
+        <span class="slider-span" id="slider-span5"></span>
+
+        <div class="image-slider">
+            <div class="slides-div" id="slide-1">
+                <img src="images/akerLeilighet.jpg" alt="" class="img" id="img1">
+                <a href="#slider-span1" class="button" id="button-1"></a>
+            </div>
+            <div class="slides-div" id="slide-2">
+                <img src="images/osloLeilighet.jpg" alt="" class="img" id="img2">
+                <a href="#slider-span2" class="button" id="button-2"></a>
+            </div>
+            <div class="slides-div" id="slide-3">
+                <img src="images/lørenskogLeilighet.jpg" alt="" class="img" id="img3">
+                <a href="#slider-span3" class="button" id="button-3"></a>
+            </div>
+            <div class="slides-div" id="slide-4">
+                <img src="images/stavangerLeilighet.jpg" alt="" class="img" id="img4">
+                <a href="#slider-span4" class="button" id="button-4"></a>
+            </div>
+            <div class="slides-div" id="slide-5">
+                <img src="images/trondheimLeilighet.jpg" alt="" class="img" id="img5">
+                <a href="#slider-span5" class="button" id="button-5"></a>
+            </div>
+        </div>
+
+    </div>
+    </div>
+    <br />
+    <br />
 </div>
 
