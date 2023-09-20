@@ -1,4 +1,4 @@
-﻿html {
+html {
   font-size: 14px;
 }
 
@@ -15,4 +15,138 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.backgroundHome {
+    width: 100%;
+    height: 100%;
+    background-image: url("/images/bakgrunn.jpg");
+    background-repeat: repeat-y;
+    background-size: cover;
+    background-color: #cccccc;
+    justify-content: center;
+    text-align: center;
+    
+}
+.searchBar {
+    text-align:left;
+    margin-left:35%;
+    width: 400px;
+    height: 200px;
+    align-self: center;
+    justify-self: center;
+    background-color: transparent;
+}
+
+.background2 {
+    width: 100%;
+    background-color: rgba(40,40,40, 0.3);
+}
+
+
+.searchBar > input{
+    margin-top:60px;
+    width:300px;
+    margin-bottom:-50px;
+}
+
+#additional1{
+    margin-top:-25px;
+    width:180px;
+}
+#additional2 {
+    margin-top: -20px;
+    width: 180px;
+}
+
+.bilder {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    background-color:white;
+}
+
+
+.slide-container {
+    justify-self:center;
+    width:700px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.image-slider {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 1s;
+}
+
+.slides-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+}
+
+.img {
+    position: relative;
+    width: 220px;
+    height: 285px;
+    object-fit:cover;
+    transition: 0.5s;
+}
+
+.button {
+    position: absolute;
+    width: 220px;
+    height: 285px;
+    transition: 0.5s;
+    background-color: rgb(40, 40, 40, 0.7);
+}
+
+#slider-span1:target ~ .image-slider #img1,
+#slider-span1:target ~ .image-slider #button-1,
+#slider-span2:target ~ .image-slider #img2,
+#slider-span2:target ~ .image-slider #button-2,
+#slider-span3:target ~ .image-slider #img3,
+#slider-span3:target ~ .image-slider #button-3,
+#slider-span4:target ~ .image-slider #img4,
+#slider-span4:target ~ .image-slider #button-4,
+#slider-span5:target ~ .image-slider #img5,
+#slider-span5:target ~ .image-slider #button-5 {
+    width: 220px;
+    height: 285px;
+    color: transparent;
+    background-color: transparent;
+}
+
+#slider-span1:target ~ .image-slider {
+    left: 70%;
+}
+
+#slider-span2:target ~ .image-slider {
+    left: 35%;
+}
+
+#slider-span3:target ~ .image-slider {
+    left: 0%;
+}
+#slider-span4:target ~ .image-slider {
+    left: -35%;
+}
+
+#slider-span5:target ~ .image-slider {
+    left: -70%;
 }
