@@ -1,0 +1,15 @@
+﻿@model IEnumerable<WildStays.Models.Listing>
+
+<div class="container">
+    <h1>Listings</h1>
+    <table class="table table-striped">
+        <tr><th>Id</th><th>Name</th></tr>
+        @foreach (var listing in Model)
+        {
+            <tr>
+                <td>@listing.ListingId</td>
+                <td>@listing.Name</td>
+            </tr>
+        }
+    </table>
+</div>
