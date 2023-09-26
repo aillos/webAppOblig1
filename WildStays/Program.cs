@@ -15,13 +15,13 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseContex
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSession();
-builder.Services.AddDbContext<DatabaseContext>(options =>
+builder.Services.AddDbContext<DatabaseDbContext>(options =>
 {
     options.UseSqlite(connectionString); // Ensure you're using the correct connection string
 });
 
 builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddEntityFrameworkStores<DatabaseContext>();
+    .AddEntityFrameworkStores<DatabaseDbContext>();
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 

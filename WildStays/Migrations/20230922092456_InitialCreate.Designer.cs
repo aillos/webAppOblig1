@@ -10,7 +10,7 @@ using WildStays.DAL;
 
 namespace WildStays.Migrations
 {
-    [DbContext(typeof(DatabaseContext))]
+    [DbContext(typeof(DatabaseDbContext))]
     [Migration("20230922092456_InitialCreate")]
     partial class InitialCreate
     {

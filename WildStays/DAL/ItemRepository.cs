@@ -5,11 +5,11 @@ namespace WildStays.DAL;
 
 public class ItemRepository : IItemRepository
 {
-    private readonly DatabaseContext _db;
+    private readonly DatabaseDbContext _db;
 
     private readonly ILogger<ItemRepository> _logger;
 
-    public ItemRepository(DatabaseContext db, ILogger<ItemRepository> logger)
+    public ItemRepository(DatabaseDbContext db, ILogger<ItemRepository> logger)
     {
         _db = db;
         _logger = logger;

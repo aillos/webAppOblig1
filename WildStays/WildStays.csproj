@@ -25,4 +25,8 @@
   <ItemGroup>
     <None Remove="Views\Listings\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Views\Reservations\Details.cshtml" />
+    <None Include="Views\Reservations\Index.cshtml" />
+  </ItemGroup>
 </Project>
