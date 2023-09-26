@@ -6,7 +6,6 @@ using System;
 using WildStays.DAL;
 using WildStays.Models;
 using Microsoft.AspNetCore.Identity;
-using MyShop.DAL;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);

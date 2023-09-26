@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WildStays.Models;
-using WildStays.DAL;
 
-namespace MyShop.DAL;
+namespace WildStays.DAL;
 
 public class ItemRepository : IItemRepository
 {
