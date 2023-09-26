@@ -6,7 +6,7 @@
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    string username = @UserManager.GetUserName(User);
+    string username = UserManager.GetUserName(User);
 
     <li class="nav-item">
         <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello, @username.Substring(0, username.IndexOf('@'))!</a>
