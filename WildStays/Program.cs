@@ -9,19 +9,19 @@ using Microsoft.AspNetCore.Identity;
 using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DatabaseDbContextConnection") ?? throw new InvalidOperationException("Connection string 'DatabaseDbContextConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DatabaseContextConnection") ?? throw new InvalidOperationException("Connection string 'DatabaseContextConnection' not found.");
 
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSession();
-builder.Services.AddDbContext<DatabaseDbContext>(options =>
+builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseSqlite(connectionString); // Ensure you're using the correct connection string
 });
 
 builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddEntityFrameworkStores<DatabaseDbContext>();
+    .AddEntityFrameworkStores<DatabaseContext>();
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 

@@ -10,7 +10,7 @@ using WildStays.DAL;
 
 namespace WildStays.Migrations
 {
-    [DbContext(typeof(DatabaseDbContext))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20230925135357_UpdatedListings")]
     partial class UpdatedListings
     {
