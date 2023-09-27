@@ -52,8 +52,6 @@ namespace WildStays.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateReservation(int listingId, DateTime startDate, DateTime endDate)
         {
-            bool isReservationSuccessful = false;
-
             try
             {
                 var listing = await _itemRepository.GetItemById(listingId);
@@ -77,7 +75,8 @@ namespace WildStays.Controllers
                 // Try to create the reservation
                 if (await _itemRepository.CreateReservation(reservation))
                 {
-                    isReservationSuccessful = true;
+                    // Pass the reservation data to the ReservationConfirmation view
+                    return View("ReservationConfirmation", reservation);
                 }
                 else
                 {
@@ -91,17 +90,10 @@ namespace WildStays.Controllers
                 ModelState.AddModelError(string.Empty, "An error occurred while creating the reservation. Please try again later.");
             }
 
-            if (isReservationSuccessful)
-            {
-                // Redirect to a confirmation page or other appropriate action
-                return RedirectToAction("ReservationConfirmation");
-            }
-            else
-            {
-                // Return to the Details view with error messages
-                return RedirectToAction("Details", new { id = listingId });
-            }
+            // Return to the Details view with error messages
+            return RedirectToAction("Details", new { id = listingId });
         }
+
 
     }
 }
