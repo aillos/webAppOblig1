@@ -10,90 +10,84 @@ using WildStays.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace WildStays.Controllers
 {
     public class ReservationsController : Controller
     {
-        private readonly DatabaseDbContext _context;
+        private readonly IItemRepository _itemRepository;
+        private readonly ILogger<ListingsController> _logger;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public ReservationsController(DatabaseDbContext context, UserManager<IdentityUser> usermanager)
+        public ReservationsController(IItemRepository itemRepository,
+            ILogger<ListingsController> logger,
+            UserManager<IdentityUser> userManager)
         {
-            _context = context;
-            _userManager = usermanager;
+            _itemRepository = itemRepository;
+            _logger = logger;
+            _userManager = userManager;
         }
 
+
         // Action to display a list of available listings
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var listings = _context.Listings.ToList();
+            var listings = await _itemRepository.GetAll();
             return View(listings);
         }
 
         // Action to display details of a listing and allow reservation
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var listing = _context.Listings.FirstOrDefault(l => l.Id == id);
+            var listing = await _itemRepository.GetItemById(id);
             if (listing == null)
             {
                 return NotFound();
             }
-
             return View(listing);
         }
 
         // Action to create a reservation
         [Authorize]
         [HttpPost]
-        public IActionResult CreateReservation(int listingId, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> CreateReservation(int listingId, DateTime startDate, DateTime endDate)
         {
             bool isReservationSuccessful = false;
 
             try
             {
-                var listing = _context.Listings.FirstOrDefault(l => l.Id == listingId);
+                var listing = await _itemRepository.GetItemById(listingId);
                 if (listing == null)
                 {
                     return NotFound();
                 }
 
-                // Check if the listing is available for the selected date range
-                bool isAvailable = !_context.Reservations.Any(r =>
-                    r.ListingId == listingId &&
-                    ((startDate >= r.StartDate && startDate <= r.EndDate) ||
-                     (endDate >= r.StartDate && endDate <= r.EndDate)));
+                // Get the authenticated user's ID
+                var userId = _userManager.GetUserId(User);
 
-                if (isAvailable)
+                // Create a new reservation
+                var reservation = new Reservation
                 {
-                    // Get the authenticated user's ID
-                    var userId = _userManager.GetUserId(User);
+                    ListingId = listingId,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    UserId = userId
+                };
 
-                    // Create a new reservation and save it to the database
-                    var reservation = new Reservation
-                    {
-                        ListingId = listingId,
-                        StartDate = startDate,
-                        EndDate = endDate,
-                        UserId = userId // Set the UserId to the authenticated user's ID
-                    };
-
-                    _context.Reservations.Add(reservation);
-                    _context.SaveChanges();
-
-                    // Set the flag to indicate a successful reservation
+                // Try to create the reservation
+                if (await _itemRepository.CreateReservation(reservation))
+                {
                     isReservationSuccessful = true;
                 }
                 else
                 {
-                    // Handle case where the listing is not available
                     ModelState.AddModelError(string.Empty, "This listing is not available for the selected dates.");
                 }
             }
-            catch (DbUpdateException ex)
+            catch (Exception ex)
             {
-                // Log the exception for debugging purposes
-                // You can use your preferred logging mechanism here
-                Console.WriteLine("DbUpdateException occurred: " + ex.InnerException?.Message);
+                // Handle exceptions
+                _logger.LogError("An error occurred while creating the reservation: {ex}", ex);
                 ModelState.AddModelError(string.Empty, "An error occurred while creating the reservation. Please try again later.");
             }
 

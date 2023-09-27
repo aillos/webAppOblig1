@@ -109,6 +109,33 @@ public class ItemRepository : IItemRepository
             return null;
         }
     }
+    public async Task<bool> CreateReservation(Reservation reservation)
+    {
+        try
+        {
+            // Check if the listing is available for the selected date range
+            bool isAvailable = !_db.Reservations.Any(r =>
+                r.ListingId == reservation.ListingId &&
+                ((reservation.StartDate >= r.StartDate && reservation.StartDate <= r.EndDate) ||
+                 (reservation.EndDate >= r.StartDate && reservation.EndDate <= r.EndDate)));
+
+            if (isAvailable)
+            {
+                _db.Reservations.Add(reservation);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false; // Reservation not available
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] reservation creation failed for reservation {@reservation}, error message: {e}", reservation, e.Message);
+            return false;
+        }
+    }
 
 }
 

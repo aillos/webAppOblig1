@@ -10,6 +10,7 @@ public interface IItemRepository
     Task<bool> Create(Listing listing);
     Task<bool> Update(Listing listing);
     Task<bool> Delete(int id);
+    Task<bool> CreateReservation(Reservation reservation);
 }
 
 
