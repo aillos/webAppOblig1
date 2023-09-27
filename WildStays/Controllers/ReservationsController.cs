@@ -73,28 +73,27 @@ namespace WildStays.Controllers
                 };
 
                 // Try to create the reservation
-                if (await _itemRepository.CreateReservation(reservation))
+                bool isReservationSuccessful = await _itemRepository.CreateReservation(reservation);
+
+                if (isReservationSuccessful)
                 {
                     // Pass the reservation data to the ReservationConfirmation view
                     return View("ReservationConfirmation", reservation);
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "This listing is not available for the selected dates.");
+                    TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
+                    return RedirectToAction("Details", new { id = listingId });
                 }
             }
             catch (Exception ex)
             {
                 // Handle exceptions
                 _logger.LogError("An error occurred while creating the reservation: {ex}", ex);
-                ModelState.AddModelError(string.Empty, "An error occurred while creating the reservation. Please try again later.");
+                TempData["ErrorMessage"] = "An error occurred while creating the reservation. Please try again later.";
+                return RedirectToAction("Details", new { id = listingId });
             }
-
-            // Return to the Details view with error messages
-            TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
-            return RedirectToAction("Details", new { id = listingId });
         }
-
 
     }
 }
