@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
-using WildStays.Models;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WildStays.Models
 {
@@ -8,22 +7,21 @@ namespace WildStays.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Start Date is required.")]
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "End Date is required.")]
         [Display(Name = "End Date")]
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime EndDate { get; set; }
 
         public int ListingId { get; set; }
         public Listing Listing { get; set; }
 
-        // You can add additional properties here as needed
-        // For example, a reference to the user who made the reservation:
         public string UserId { get; set; }
     }
-
 }

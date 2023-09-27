@@ -29,14 +29,14 @@ namespace WildStays.Controllers
         }
 
 
-        // Action to display a list of available listings
+        // Action to display listings
         public async Task<IActionResult> Index()
         {
             var listings = await _itemRepository.GetAll();
             return View(listings);
         }
 
-        // Action to display details of a listing and allow reservation
+        // Detail action, same as in listingscontroller, but has reservations in it
         public async Task<IActionResult> Details(int id)
         {
             var listing = await _itemRepository.GetItemById(id);
@@ -47,7 +47,7 @@ namespace WildStays.Controllers
             return View(listing);
         }
 
-        // Action to create a reservation
+        // Creates a reservation
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateReservation(int listingId, DateTime startDate, DateTime endDate)
@@ -59,11 +59,29 @@ namespace WildStays.Controllers
                 {
                     return NotFound();
                 }
+                // Gets todays  date
+                var today = DateTime.Today;
+                // Check to make sure the user is not trying to reserve before todays date.
+                if (startDate <= today)
+                {
+                    TempData["ErrorMessage"] = "Start date must be after today's date.";
+                    return RedirectToAction("Details", new { id = listingId });
+                }
 
-                // Get the authenticated user's ID
+                //Check if a user is trying to have a startdate that is after the enddate
+                //And gives warning that the enddate must be after the startdate
+                if(startDate >= endDate) {
+
+                    TempData["ErrorMessage"] = "End date must be after start date" +
+                        "";
+                    return RedirectToAction("Details", new { id = listingId });
+
+                }
+
+                // Get the user id
                 var userId = _userManager.GetUserId(User);
 
-                // Create a new reservation
+                // Create  new reservation
                 var reservation = new Reservation
                 {
                     ListingId = listingId,
@@ -77,18 +95,19 @@ namespace WildStays.Controllers
 
                 if (isReservationSuccessful)
                 {
-                    // Pass the reservation data to the ReservationConfirmation view
+                    // retun the reservationconfirmation view with the reservation
                     return View("ReservationConfirmation", reservation);
                 }
                 else
                 {
+                    //If the listing is not available
                     TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
                     return RedirectToAction("Details", new { id = listingId });
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
+                // Handles exceptions and logs them
                 _logger.LogError("An error occurred while creating the reservation: {ex}", ex);
                 TempData["ErrorMessage"] = "An error occurred while creating the reservation. Please try again later.";
                 return RedirectToAction("Details", new { id = listingId });

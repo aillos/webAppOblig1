@@ -66,16 +66,19 @@
         </dd>
     </dl>
 </div>
+
+
 <h2>Make a Reservation</h2>
 <form asp-action="CreateReservation" method="post">
     <input type="hidden" name="listingId" value="@Model.Id" />
     <div class="form-group">
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate" required />
+        <label for="StartDate">Start Date:</label>
+        <input type="date" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
     </div>
     <div class="form-group">
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate" required />
+        <label for="EndDate">End Date:</label>
+        <input type="date" id="EndDate" name="EndDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+
     </div>
     <button type="submit">Reserve</button>
 </form>

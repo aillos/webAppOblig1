@@ -113,7 +113,7 @@ public class ItemRepository : IItemRepository
     {
         try
         {
-            // Check if the listing is available for the selected date range
+            // Check if the listing is available for the dates
             bool isAvailable = !_db.Reservations.Any(r =>
                 r.ListingId == reservation.ListingId &&
                 ((reservation.StartDate >= r.StartDate && reservation.StartDate <= r.EndDate) ||
