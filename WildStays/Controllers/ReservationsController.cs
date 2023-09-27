@@ -91,6 +91,7 @@ namespace WildStays.Controllers
             }
 
             // Return to the Details view with error messages
+            TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
             return RedirectToAction("Details", new { id = listingId });
         }
 

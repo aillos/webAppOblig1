@@ -7,6 +7,12 @@
 <h1>Details</h1>
 
 <div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
     <h4>Listing</h4>
     <hr />
     <dl class="row">
