@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using WildStays.Models;
-
+using WildStays.DAL;
 namespace WildStays.Controllers;
 
 public class HomeController : Controller

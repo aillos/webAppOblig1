@@ -11,6 +11,8 @@ public interface IItemRepository
     Task<bool> Update(Listing listing);
     Task<bool> Delete(int id);
     Task<bool> CreateReservation(Reservation reservation);
+    bool DateCheck(DateTime startDate);
+    bool StartEndCheck(DateTime startDate, DateTime endDate);
 }
 
 

@@ -17,14 +17,16 @@ namespace WildStays.Models
         [Url(ErrorMessage = "Please enter a valid image URL.")]
         public string Image { get; set; }
         public string UserId { get; set; } = string.Empty;
-        [Required]
+        [Required(ErrorMessage = "Start Date is required.")]
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime StartDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "End Date is required.")]
         [Display(Name = "End Date")]
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime EndDate { get; set; }
 
 

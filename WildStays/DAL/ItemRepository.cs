@@ -109,6 +109,9 @@ public class ItemRepository : IItemRepository
             return null;
         }
     }
+
+
+
     public async Task<bool> CreateReservation(Reservation reservation)
     {
         try
@@ -135,6 +138,15 @@ public class ItemRepository : IItemRepository
             _logger.LogError("[ItemRepository] reservation creation failed for reservation {@reservation}, error message: {e}", reservation, e.Message);
             return false;
         }
+    }
+    public bool DateCheck(DateTime startDate)
+    {
+        return startDate.Date >= DateTime.Today;
+    }
+
+    public bool StartEndCheck(DateTime startDate, DateTime endDate)
+    {
+        return startDate.Date <= endDate.Date;
     }
 
 }

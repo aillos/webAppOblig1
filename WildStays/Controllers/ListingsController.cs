@@ -15,11 +15,11 @@ namespace WildStays.Controllers
     {
         private readonly IItemRepository _itemRepository;
         private readonly ILogger<ListingsController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ListingsController(IItemRepository itemRepository,
             ILogger<ListingsController> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _itemRepository = itemRepository;
             _logger = logger;
@@ -66,7 +66,7 @@ namespace WildStays.Controllers
         // POST: Listings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId")] Listing listing)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             if (ModelState.IsValid)
             {
@@ -77,6 +77,20 @@ namespace WildStays.Controllers
                 }
 
                 listing.UserId = user.Id;
+
+                // validates that the startdate is after todays date
+                if (!_itemRepository.DateCheck(listing.StartDate))
+                {
+                    ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
+                    return View(listing);
+                }
+                //Checks if the enddate is before the startdate
+                if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
+                {
+                    ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
+                    return View(listing);
+                }
+
                 bool returnOk = await _itemRepository.Create(listing);
 
                 if (returnOk)
@@ -109,7 +123,7 @@ namespace WildStays.Controllers
         // POST: Listings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             if (ModelState.IsValid)
             {
@@ -119,6 +133,19 @@ namespace WildStays.Controllers
                 if (existingListing == null || existingListing.UserId != user.Id)
                 {
                     return Forbid();
+                }
+
+                // Validates that the startdate is not before the current date
+                if (!_itemRepository.DateCheck(listing.StartDate))
+                {
+                    ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
+                    return View(listing);
+                }
+                //Checks if the enddate is before the startdate
+                if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
+                {
+                    ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
+                    return View(listing);
                 }
 
                 bool returnOk = await _itemRepository.Update(listing);

@@ -17,11 +17,11 @@ namespace WildStays.Controllers
     {
         private readonly IItemRepository _itemRepository;
         private readonly ILogger<ListingsController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ReservationsController(IItemRepository itemRepository,
             ILogger<ListingsController> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _itemRepository = itemRepository;
             _logger = logger;
@@ -29,7 +29,7 @@ namespace WildStays.Controllers
         }
 
 
-        // Action to display listings
+        // Index
         public async Task<IActionResult> Index()
         {
             var listings = await _itemRepository.GetAll();
@@ -59,29 +59,25 @@ namespace WildStays.Controllers
                 {
                     return NotFound();
                 }
-                // Gets todays  date
-                var today = DateTime.Today;
-                // Check to make sure the user is not trying to reserve before todays date.
-                if (startDate <= today)
+
+                // Check if the start date is after todays date
+                if (!_itemRepository.DateCheck(startDate))
                 {
                     TempData["ErrorMessage"] = "Start date must be after today's date.";
                     return RedirectToAction("Details", new { id = listingId });
                 }
 
-                //Check if a user is trying to have a startdate that is after the enddate
-                //And gives warning that the enddate must be after the startdate
-                if(startDate >= endDate) {
-
-                    TempData["ErrorMessage"] = "End date must be after start date" +
-                        "";
+                // Check if the start date is before the end date
+                if (!_itemRepository.StartEndCheck(startDate, endDate))
+                {
+                    TempData["ErrorMessage"] = "End date must be after the start date.";
                     return RedirectToAction("Details", new { id = listingId });
-
                 }
 
                 // Get the user id
                 var userId = _userManager.GetUserId(User);
 
-                // Create  new reservation
+                // Create a new reservation
                 var reservation = new Reservation
                 {
                     ListingId = listingId,
@@ -95,12 +91,12 @@ namespace WildStays.Controllers
 
                 if (isReservationSuccessful)
                 {
-                    // retun the reservationconfirmation view with the reservation
+                    // Return the reservation confirmation view with the reservation
                     return View("ReservationConfirmation", reservation);
                 }
                 else
                 {
-                    //If the listing is not available
+                    // If the listing is not available
                     TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
                     return RedirectToAction("Details", new { id = listingId });
                 }
@@ -113,6 +109,7 @@ namespace WildStays.Controllers
                 return RedirectToAction("Details", new { id = listingId });
             }
         }
+
 
     }
 }

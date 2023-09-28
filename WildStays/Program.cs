@@ -20,8 +20,9 @@ builder.Services.AddDbContext<DatabaseDbContext>(options =>
     options.UseSqlite(connectionString); // Ensure you're using the correct connection string
 });
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddEntityFrameworkStores<DatabaseDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<DatabaseDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
