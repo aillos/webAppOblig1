@@ -8,6 +8,7 @@ using WildStays.Models;
 using Microsoft.AspNetCore.Identity;
 using Serilog.Events;
 
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DatabaseContextConnection") ?? throw new InvalidOperationException("Connection string 'DatabaseContextConnection' not found.");
 

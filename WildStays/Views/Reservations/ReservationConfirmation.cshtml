@@ -19,10 +19,10 @@
                 <dt class="col-sm-4">Type:</dt>
                 <dd class="col-sm-8">@Model.Listing.Type</dd>
 
-                <dt class="col-sm-4">Type:</dt>
+                <dt class="col-sm-4">Price:</dt>
                 <dd class="col-sm-8">@Model.Listing.Price</dd>
 
-                <dt class="col-sm-4">Type:</dt>
+                <dt class="col-sm-4">Image:</dt>
                 <dd class="col-sm-8">@Model.Listing.Image</dd>
 
 
@@ -42,7 +42,8 @@
         </div>
     </div>
 </div>
-<div>
+<form method="post" asp-action="ConfirmReservation">
+    <button type="submit" class="btn btn-primary">Confirm Reservation</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
 
-    <a asp-action="Index">Back to List</a>
-</div>

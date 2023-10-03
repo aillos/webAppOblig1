@@ -9,6 +9,7 @@ using WildStays.DAL;
 using WildStays.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 
 namespace WildStays.Controllers
@@ -27,6 +28,7 @@ namespace WildStays.Controllers
             _logger = logger;
             _userManager = userManager;
         }
+
 
 
         // Index

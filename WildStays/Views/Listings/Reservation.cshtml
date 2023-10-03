@@ -1,0 +1,56 @@
+﻿@model IEnumerable<WildStays.Models.Reservation>
+
+@{
+    ViewData["Title"] = "My Reservations";
+}
+
+<h1>My Reservations</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Listing Name
+            </th>
+            <th>
+                Start Date
+            </th>
+            <th>
+                End Date
+            </th>
+            <th>
+                Price per night
+            </th>
+            <th>
+                End Date
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reservation in Model)
+        {
+            <tr>
+                <td>
+                    @reservation.Listing.Name
+                </td>
+                <td>
+                    @reservation.StartDate.ToShortDateString()
+                </td>
+                <td>
+                    @reservation.EndDate.ToShortDateString()
+                </td>
+                <td>
+                    @reservation.Listing.Price
+                </td>
+                <td>
+                    @reservation.Listing.Price * @reservation.StartDate.ToShortDateString() - @reservation.EndDate.ToShortDateString()
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+<a asp-action="Index">Back to List</a>
+</div>
+
+

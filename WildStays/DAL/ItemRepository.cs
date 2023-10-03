@@ -109,6 +109,18 @@ public class ItemRepository : IItemRepository
             return null;
         }
     }
+    public async Task<IEnumerable<Reservation>> GetReservationByUserId(string userId)
+    {
+        try
+        {
+            return await _db.Reservations.Where(l => l.UserId == userId).Include(r => r.Listing).ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] Failed to find the reservation by user ID, error message: {e}", e.Message);
+            return null;
+        }
+    }
 
 
 
