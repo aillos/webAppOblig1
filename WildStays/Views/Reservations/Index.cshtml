@@ -5,11 +5,95 @@
 }
 
 <h1>Index</h1>
+<form asp-action="Index" method="get">
+    <div class="form-group">
+        <label for="AmountPeople">Filter by Number of Guests:</label>
+        <select name="AmountPeople" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+
+        <label for="AmountBathrooms">Filter by Number of Bathrooms:</label>
+        <select name="AmountBathrooms" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+
+        <!-- Correct the label for filtering bedrooms -->
+        <label for="AmountBedrooms">Filter by Number of Bedrooms:</label>
+        <select name="AmountBedrooms" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Apply Filter</button>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Place)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -43,6 +127,9 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.Place)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
@@ -69,5 +156,8 @@
                 </td>
             </tr>
         }
+       
+
     </tbody>
 </table>
+

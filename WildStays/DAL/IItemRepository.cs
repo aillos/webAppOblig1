@@ -5,7 +5,7 @@ namespace WildStays.DAL;
 public interface IItemRepository
 {
     Task<IEnumerable<Listing>> GetAll();
-    Task<Listing> GetItemById(int id);
+    Task<Listing?> GetItemById(int id);
     Task<IEnumerable<Listing>> GetListingsByUserId(string userId);
     Task<IEnumerable<Reservation>> GetReservationByUserId(string userId);
     Task<bool> Create(Listing listing);
@@ -14,6 +14,7 @@ public interface IItemRepository
     Task<bool> CreateReservation(Reservation reservation);
     bool DateCheck(DateTime startDate);
     bool StartEndCheck(DateTime startDate, DateTime endDate);
+    Task<IEnumerable<Listing>> FilterListings(int? minGuests, int? minBathrooms, int? minBedrooms);
 
 }
 

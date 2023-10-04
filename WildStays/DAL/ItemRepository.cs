@@ -23,7 +23,7 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] items ToListAsync() failed when GetAll(), error message: {e}", e.Message);
+            _logger.LogError("[ItemRepository] failed to get all items, error message: {e}", e.Message);
             return null;
         }
 
@@ -37,7 +37,7 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] item FindAsync(id) failed when GetItemById for ItemId {ItemId:0000}, error message: {e}", id, e.Message);
+            _logger.LogError("[ItemRepository] failed to get item by Id {ItemId:0000}, error message: {e}", id, e.Message);
             return null;
         }
 
@@ -54,7 +54,7 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] listing creation failed for listing {@listing}, error message: {e}", listing, e.Message);
+            _logger.LogError("[ItemRepository] failed to create the listing {@listing}, error message: {e}", listing, e.Message);
             return false;
         }
     }
@@ -69,7 +69,7 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] listing creation failed for listing {@listing}, error message: {e}", listing, e.Message);
+            _logger.LogError("[ItemRepository] failed to update the listing {@listing}, error message: {e}", listing, e.Message);
             return false;
         }
 
@@ -82,7 +82,7 @@ public class ItemRepository : IItemRepository
             var listing = await _db.Listings.FindAsync(id);
             if (listing == null)
             {
-                _logger.LogError("[ItemRepository] item not found for the ItemId {ItemId:0000}", id);
+                _logger.LogError("[ItemRepository] could not find the item with item Id {ItemId:0000}", id);
                 return false;
             }
 
@@ -92,12 +92,12 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] item deletion failed for the ItemId {ItemId:0000}, error message: {e}", id, e.Message);
+            _logger.LogError("[ItemRepository] Failed to delete the item with the Id {ItemId:0000}, error message: {e}", id, e.Message);
             return false;
         }
     }
 
-    public async Task<IEnumerable<Listing>> GetListingsByUserId(string userId)
+    public async Task<IEnumerable<Listing>?> GetListingsByUserId(string userId)
     {
         try
         {
@@ -105,11 +105,11 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] Failed to fetch listings by user ID, error message: {e}", e.Message);
+            _logger.LogError("[ItemRepository] Failed to get the listings based on the spescific user(Id), error message: {e}", e.Message);
             return null;
         }
     }
-    public async Task<IEnumerable<Reservation>> GetReservationByUserId(string userId)
+    public async Task<IEnumerable<Reservation>?> GetReservationByUserId(string userId)
     {
         try
         {
@@ -117,7 +117,7 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] Failed to find the reservation by user ID, error message: {e}", e.Message);
+            _logger.LogError("[ItemRepository] Failed to find the reservation based on UserID error message: {e}", e.Message);
             return null;
         }
     }
@@ -160,6 +160,45 @@ public class ItemRepository : IItemRepository
     {
         return startDate.Date <= endDate.Date;
     }
+
+    // ItemRepository
+    // ItemRepository
+    // ItemRepository
+    public async Task<IEnumerable<Listing>?> FilterListings(int? minGuests, int? minBathrooms, int? minBedrooms)
+    {
+        try
+        {
+            //Includes all listings if no filters, as true is always true
+            var query = _db.Listings.Where(l => true); 
+
+            if (minGuests.HasValue)
+            {
+                query = query.Where(l => l.Guests >= minGuests);
+            }
+
+            if (minBathrooms.HasValue)
+            {
+                query = query.Where(l => l.Bathrooms >= minBathrooms);
+            }
+
+            if (minBedrooms.HasValue)
+            {
+                query = query.Where(l => l.Bedrooms >= minBedrooms);
+            }
+
+            return await query.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] Failed to filter listings, error message: {e}", e.Message);
+            return null;
+        }
+    }
+
+
+
+
+
 
 }
 

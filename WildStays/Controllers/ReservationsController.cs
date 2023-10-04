@@ -9,7 +9,6 @@ using WildStays.DAL;
 using WildStays.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 
 
 namespace WildStays.Controllers
@@ -32,11 +31,14 @@ namespace WildStays.Controllers
 
 
         // Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms)
         {
-            var listings = await _itemRepository.GetAll();
+            var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms);
+
             return View(listings);
         }
+
+
 
         // Detail action, same as in listingscontroller, but has reservations in it
         public async Task<IActionResult> Details(int id)

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WildStays.Controllers
 {
@@ -25,6 +26,8 @@ namespace WildStays.Controllers
             _logger = logger;
             _userManager = userManager;
         }
+       
+
 
         // GET: Listings
         public async Task<IActionResult> Index()
@@ -58,6 +61,7 @@ namespace WildStays.Controllers
         }
 
         // GET: Listings/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +70,7 @@ namespace WildStays.Controllers
         // POST: Listings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             if (ModelState.IsValid)
@@ -103,6 +108,7 @@ namespace WildStays.Controllers
         }
 
         // GET: Listings/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var listing = await _itemRepository.GetItemById(id);
@@ -123,6 +129,7 @@ namespace WildStays.Controllers
         // POST: Listings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             if (ModelState.IsValid)
@@ -160,6 +167,7 @@ namespace WildStays.Controllers
         }
 
         // GET: Listings/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var listing = await _itemRepository.GetItemById(id);
@@ -180,6 +188,7 @@ namespace WildStays.Controllers
         // POST: Listings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -207,6 +216,7 @@ namespace WildStays.Controllers
         }
 
         // GET: Listings/MyReservations
+        [Authorize]
         public async Task<IActionResult> Reservation()
         {
             var user = await _userManager.GetUserAsync(User);
