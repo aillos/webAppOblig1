@@ -35,7 +35,7 @@ namespace WildStays.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return RedirectToAction("Login", "Identity" + "/" + "Account");
+                new RedirectToPageResult("/Account/Login", new { area = "Identity" });
             }
 
             var listings = await _itemRepository.GetListingsByUserId(user.Id);
@@ -78,7 +78,7 @@ namespace WildStays.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    return RedirectToAction("Login", "Identity" + "/" + "Account");
+                    return new RedirectToPageResult("/Account/Login", new { area = "Identity" });
                 }
 
                 listing.UserId = user.Id;
