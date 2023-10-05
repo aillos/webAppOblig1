@@ -31,9 +31,9 @@ namespace WildStays.Controllers
 
 
         // Index
-        public async Task<IActionResult> Index(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms)
+        public async Task<IActionResult> Index(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
         {
-            var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms);
+            var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms, MinPrice, MaxPrice);
 
             return View(listings);
         }

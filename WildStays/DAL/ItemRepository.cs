@@ -63,7 +63,16 @@ public class ItemRepository : IItemRepository
     {
         try
         {
-            _db.Listings.Update(listing);
+            // Find the existing entity in the context and detach it if it's being tracked
+            var existingListing = await _db.Listings.FindAsync(listing.Id);
+            if (existingListing != null)
+            {
+                _db.Entry(existingListing).State = EntityState.Detached;
+            }
+
+            // Attach and update the entity
+            _db.Entry(listing).State = EntityState.Modified;
+
             await _db.SaveChangesAsync();
             return true;
         }
@@ -72,8 +81,8 @@ public class ItemRepository : IItemRepository
             _logger.LogError("[ItemRepository] failed to update the listing {@listing}, error message: {e}", listing, e.Message);
             return false;
         }
-
     }
+
 
     public async Task<bool> Delete(int id)
     {
@@ -120,6 +129,7 @@ public class ItemRepository : IItemRepository
             _logger.LogError("[ItemRepository] Failed to find the reservation based on UserID error message: {e}", e.Message);
             return null;
         }
+
     }
 
 
@@ -164,26 +174,34 @@ public class ItemRepository : IItemRepository
     // ItemRepository
     // ItemRepository
     // ItemRepository
-    public async Task<IEnumerable<Listing>?> FilterListings(int? minGuests, int? minBathrooms, int? minBedrooms)
+    public async Task<IEnumerable<Listing>?> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
     {
         try
         {
             //Includes all listings if no filters, as true is always true
             var query = _db.Listings.Where(l => true); 
 
-            if (minGuests.HasValue)
+            if (AmountGuests.HasValue)
             {
-                query = query.Where(l => l.Guests >= minGuests);
+                query = query.Where(l => l.Guests >= AmountGuests);
             }
 
-            if (minBathrooms.HasValue)
+            if (AmountBathrooms.HasValue)
             {
-                query = query.Where(l => l.Bathrooms >= minBathrooms);
+                query = query.Where(l => l.Bathrooms >= AmountBathrooms);
             }
 
-            if (minBedrooms.HasValue)
+            if (AmountBedrooms.HasValue)
             {
-                query = query.Where(l => l.Bedrooms >= minBedrooms);
+                query = query.Where(l => l.Bedrooms >= AmountBedrooms);
+            }
+            if (MinPrice.HasValue)
+            {
+                query = query.Where(l => l.Price >= MinPrice);
+            }
+            if (MaxPrice.HasValue)
+            {
+                query = query.Where(l => l.Price <= MaxPrice);
             }
 
             return await query.ToListAsync();

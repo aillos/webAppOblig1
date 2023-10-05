@@ -71,7 +71,7 @@ namespace WildStays.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
+        public async Task<IActionResult> Create([Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             if (ModelState.IsValid)
             {
@@ -126,45 +126,62 @@ namespace WildStays.Controllers
             return View(listing);
         }
 
-        // POST: Listings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = await _userManager.GetUserAsync(User);
-                var existingListing = await _itemRepository.GetItemById(listing.Id);
-
-                if (existingListing == null || existingListing.UserId != user.Id)
+                if (ModelState.IsValid)
                 {
-                    return Forbid();
-                }
+                    var user = await _userManager.GetUserAsync(User);
+                    var existingListing = await _itemRepository.GetItemById(listing.Id);
 
-                // Validates that the startdate is not before the current date
-                if (!_itemRepository.DateCheck(listing.StartDate))
-                {
-                    ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
-                    return View(listing);
-                }
-                //Checks if the enddate is before the startdate
-                if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
-                {
-                    ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
-                    return View(listing);
-                }
+                    if (existingListing == null || existingListing.UserId != user.Id)
+                    {
+                        return Forbid();
+                    }
+                    listing.UserId = user.Id;
 
-                bool returnOk = await _itemRepository.Update(listing);
+                    // Validates that the startdate is not before the current date
+                    if (!_itemRepository.DateCheck(listing.StartDate))
+                    {
+                        ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
+                        return View(listing);
+                    }
 
-                if (returnOk)
-                {
-                    return RedirectToAction(nameof(Index));
+                    // Checks if the enddate is before the startdate
+                    if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
+                    {
+                        ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
+                        return View(listing);
+                    }
+
+                    bool returnOk = await _itemRepository.Update(listing);
+
+                    if (returnOk)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        // Handle update failure
+                        TempData["ErrorMessage"] = "Failed to update the listing. Please try again later.";
+                    }
                 }
+                // If ModelState is not valid, return the view with validation errors
+                return View(listing);
             }
-
-            return View(listing);
+            catch (Exception ex)
+            {
+                _logger.LogError("An error occurred while editing the listing: {ex}", ex);
+                TempData["ErrorMessage"] = "An error occurred while editing the listing. Please try again later.";
+                return RedirectToAction("Details", new { id = id });
+            }
         }
+
+
 
         // GET: Listings/Delete/5
         [Authorize]
