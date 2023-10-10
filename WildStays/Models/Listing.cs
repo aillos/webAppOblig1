@@ -8,18 +8,19 @@ namespace WildStays.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
+        //Checks that string is smaller that 100 characters.
         [StringLength(100, ErrorMessage = "Name must be less than 100 characters.")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Place is required.")]
         public string Place { get; set; }
 
-        [Required(ErrorMessage = "Description is required.")]
         public string Description { get; set; }
 
         public string? Type { get; set; }
 
         [Required(ErrorMessage = "Price is required.")]
+        //Cheks that the price is between 1 and the max int value.
         [Range(1, int.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         public int Price { get; set; }
 

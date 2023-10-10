@@ -33,6 +33,7 @@ namespace WildStays.Controllers
         // Index
         public async Task<IActionResult> Index(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
         {
+            //Returnes the listings with filters, if any, see the method in Itemrepository for further information.
             var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms, MinPrice, MaxPrice);
 
             return View(listings);
@@ -81,7 +82,7 @@ namespace WildStays.Controllers
                 // Get the user id
                 var userId = _userManager.GetUserId(User);
 
-                // Create a new reservation
+                // Create a new reservation info.
                 var reservation = new Reservation
                 {
                     ListingId = listingId,
@@ -95,12 +96,12 @@ namespace WildStays.Controllers
 
                 if (isReservationSuccessful)
                 {
-                    // Return the reservation confirmation view with the reservation
+                    // Return the reservation confirmation view with the reservation.
                     return View("ReservationConfirmation", reservation);
                 }
                 else
                 {
-                    // If the listing is not available
+                    // If the listing is not available, returnes this message to the details view.
                     TempData["ErrorMessage"] = "This listing is not available for the selected dates.";
                     return RedirectToAction("Details", new { id = listingId });
                 }

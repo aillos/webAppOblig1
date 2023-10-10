@@ -31,6 +31,7 @@ namespace WildStays.Areas.Identity.Pages.Account
  
 
         public RegisterModel(
+            //Changed to applicationUser instead of identityUser
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
@@ -94,6 +95,7 @@ namespace WildStays.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            //Added these extra fields from the ApplicationUser Model.
             [Required]
             [Display(Name = "Gender")]
             public string Gender { get; set; }
@@ -116,15 +118,16 @@ namespace WildStays.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
+            
             if (ModelState.IsValid)
             {
+                //The data
                 var user = new ApplicationUser
                 {
                     UserName = Input.Email,
                     Email = Input.Email,
                     Gender = Input.Gender,
-                    FirstName = Input.FirstName, // Set FirstName here
+                    FirstName = Input.FirstName,
                     LastName = Input.LastName,
                     Age = Input.Age
                 };

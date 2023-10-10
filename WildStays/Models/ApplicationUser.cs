@@ -2,6 +2,7 @@
 
 namespace WildStays.DAL
 {
+    //Applicationuser extends Identityuser, the default user model when using ApsNetCore.Identity.
     public class ApplicationUser : IdentityUser
     {
         public string Gender { get; set; }

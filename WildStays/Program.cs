@@ -16,6 +16,7 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseContex
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSession();
+//Adds Database db context
 builder.Services.AddDbContext<DatabaseDbContext>(options =>
 {
     options.UseSqlite(connectionString); // Ensure you're using the correct connection string
@@ -48,7 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // Configure error handling for production
+    // Adds error handling
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
@@ -57,7 +58,7 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 
-// Authentication and Authorization middleware
+// Adding authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 

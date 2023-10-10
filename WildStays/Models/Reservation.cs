@@ -20,6 +20,7 @@ namespace WildStays.Models
         public DateTime EndDate { get; set; }
 
         public int ListingId { get; set; }
+        //Incoreperates the listings view so that they can work together.
         public Listing Listing { get; set; }
 
         public string UserId { get; set; }

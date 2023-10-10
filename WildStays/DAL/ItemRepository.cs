@@ -15,6 +15,7 @@ public class ItemRepository : IItemRepository
         _logger = logger;
     }
 
+    //Same method as in the demo from module 6, gets all listings.
     public async Task<IEnumerable<Listing>?> GetAll()
     {
         try
@@ -28,7 +29,7 @@ public class ItemRepository : IItemRepository
         }
 
     }
-
+    //Same method as in the demo from module 6, gets a listing based on the item id.
     public async Task<Listing?> GetItemById(int id)
     {
         try
@@ -43,7 +44,7 @@ public class ItemRepository : IItemRepository
 
     }
 
-
+    //Same method as in the demo from module 6, createas a listing to the database.
     public async Task<bool> Create(Listing listing)
     {
         try
@@ -59,18 +60,19 @@ public class ItemRepository : IItemRepository
         }
     }
 
+    //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
     public async Task<bool> Update(Listing listing)
     {
         try
         {
-            // Find the existing entity in the context and detach it if it's being tracked
+            // Detaches listing if it is being tracked.
             var existingListing = await _db.Listings.FindAsync(listing.Id);
             if (existingListing != null)
             {
                 _db.Entry(existingListing).State = EntityState.Detached;
             }
 
-            // Attach and update the entity
+            // Attach the listing again.
             _db.Entry(listing).State = EntityState.Modified;
 
             await _db.SaveChangesAsync();
@@ -83,7 +85,7 @@ public class ItemRepository : IItemRepository
         }
     }
 
-
+    //Same method as in the demo from module 6, deletes a listing.
     public async Task<bool> Delete(int id)
     {
         try
@@ -106,10 +108,12 @@ public class ItemRepository : IItemRepository
         }
     }
 
+    //Method to get a listing by userId, used to show only show a user their listings
     public async Task<IEnumerable<Listing>?> GetListingsByUserId(string userId)
     {
         try
         {
+            //Lamda expression to fetch listings with userId matching the currently logged in users Id.
             return await _db.Listings.Where(l => l.UserId == userId).ToListAsync();
         }
         catch (Exception e)
@@ -118,10 +122,12 @@ public class ItemRepository : IItemRepository
             return null;
         }
     }
+    //Method to get reservations by user id.
     public async Task<IEnumerable<Reservation>?> GetReservationByUserId(string userId)
     {
         try
         {
+            //Also lamda expressions to get reservations with the users userId, but also gets information from the listings database assosiated with the reservation.
             return await _db.Reservations.Where(l => l.UserId == userId).Include(r => r.Listing).ToListAsync();
         }
         catch (Exception e)
@@ -133,17 +139,17 @@ public class ItemRepository : IItemRepository
     }
 
 
-
+    //Creates a reservation
     public async Task<bool> CreateReservation(Reservation reservation)
     {
         try
         {
-            // Check if the listing is available for the dates
+            // Check if the listing is available between the specified dayes. Checks both the reservation and listing databases if the dates are in the reservations database, or are not in the listing.
             bool isAvailable = !_db.Reservations.Any(r =>
                 r.ListingId == reservation.ListingId &&
                 ((reservation.StartDate >= r.StartDate && reservation.StartDate <= r.EndDate) ||
                  (reservation.EndDate >= r.StartDate && reservation.EndDate <= r.EndDate)));
-
+            //If available adds the reservation to the database
             if (isAvailable)
             {
                 _db.Reservations.Add(reservation);
@@ -161,26 +167,29 @@ public class ItemRepository : IItemRepository
             return false;
         }
     }
+    //Checks if the startdate is after todays date
     public bool DateCheck(DateTime startDate)
     {
         return startDate.Date >= DateTime.Today;
     }
 
+    //Cheks if the enddate is not before the startdate
     public bool StartEndCheck(DateTime startDate, DateTime endDate)
     {
         return startDate.Date <= endDate.Date;
     }
 
-    // ItemRepository
-    // ItemRepository
-    // ItemRepository
+
+    //Adds filters so that the user can filter their view.
     public async Task<IEnumerable<Listing>?> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
     {
         try
         {
-            //Includes all listings if no filters, as true is always true
+            //Includes all listings if no filters, as true is always true.
             var query = _db.Listings.Where(l => true); 
 
+            //If the guest filter is in use, a lamda expression only fetches listings that have that amount of guests or more.
+            //All under uses the same logic
             if (AmountGuests.HasValue)
             {
                 query = query.Where(l => l.Guests >= AmountGuests);

@@ -26,23 +26,27 @@ namespace WildStays.Controllers
             _logger = logger;
             _userManager = userManager;
         }
-       
+
 
 
         // GET: Listings
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            //If a user is not logged in
             if (user == null)
             {
                 new RedirectToPageResult("/Account/Login", new { area = "Identity" });
             }
-
+            //Gets all the listings for a user.
             var listings = await _itemRepository.GetListingsByUserId(user.Id);
             return View(listings);
         }
 
         // GET: Listings/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int id)
         {
             var listing = await _itemRepository.GetItemById(id);
@@ -73,6 +77,7 @@ namespace WildStays.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
+            //Checks model state
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -83,7 +88,7 @@ namespace WildStays.Controllers
 
                 listing.UserId = user.Id;
 
-                // validates that the startdate is after todays date
+                // Checks if the startdate is after todays date
                 if (!_itemRepository.DateCheck(listing.StartDate))
                 {
                     ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
@@ -95,9 +100,9 @@ namespace WildStays.Controllers
                     ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
                     return View(listing);
                 }
-
+                //Creates the listing
                 bool returnOk = await _itemRepository.Create(listing);
-
+                
                 if (returnOk)
                 {
                     return RedirectToAction(nameof(Index));
@@ -129,22 +134,25 @@ namespace WildStays.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
+        // GET: Listings/Edit/5
+        //Edit method with bind to all the models.
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
         {
             try
             {
+                //If the state of the model is valid.
                 if (ModelState.IsValid)
                 {
                     var user = await _userManager.GetUserAsync(User);
                     var existingListing = await _itemRepository.GetItemById(listing.Id);
-
+                    //Checks if the listing exists and the user made it.
                     if (existingListing == null || existingListing.UserId != user.Id)
                     {
                         return Forbid();
                     }
                     listing.UserId = user.Id;
 
-                    // Validates that the startdate is not before the current date
+                    // Checks if the startdate is after todays date
                     if (!_itemRepository.DateCheck(listing.StartDate))
                     {
                         ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
@@ -157,7 +165,7 @@ namespace WildStays.Controllers
                         ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
                         return View(listing);
                     }
-
+                    //Updates the listing
                     bool returnOk = await _itemRepository.Update(listing);
 
                     if (returnOk)
@@ -166,7 +174,7 @@ namespace WildStays.Controllers
                     }
                     else
                     {
-                        // Handle update failure
+                        // Sends 
                         TempData["ErrorMessage"] = "Failed to update the listing. Please try again later.";
                     }
                 }
@@ -210,7 +218,7 @@ namespace WildStays.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var listing = await _itemRepository.GetItemById(id);
-
+            //Checks that listing exists, and the user is the same user that made the listing.
             if (listing == null)
             {
                 return NotFound();
@@ -220,9 +228,9 @@ namespace WildStays.Controllers
             {
                 return Forbid();
             }
-
+            //Method to delete reservation
             bool returnOk = await _itemRepository.Delete(id);
-
+            //If there was a problem deleting the reservation.
             if (!returnOk)
             {
                 _logger.LogError("[ListingsController] Listing deletion failed for the Id {Id:0000}", id);
@@ -233,15 +241,18 @@ namespace WildStays.Controllers
         }
 
         // GET: Listings/MyReservations
+        //Controller to show the user their reservations.
         [Authorize]
         public async Task<IActionResult> Reservation()
         {
+            //Gets the user information
             var user = await _userManager.GetUserAsync(User);
+            //If a user is not logged in they are returned to the login screen.
             if (user == null)
             {
                 return RedirectToAction("Login", "Identity/Account");
             }
-
+            //Gets reservations based on UserID
             var reservations = await _itemRepository.GetReservationByUserId(user.Id);
             return View(reservations);
         }
