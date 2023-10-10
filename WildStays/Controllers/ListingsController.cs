@@ -26,16 +26,17 @@ namespace WildStays.Controllers
             _logger = logger;
             _userManager = userManager;
         }
-       
+
 
 
         // GET: Listings
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                new RedirectToPageResult("/Account/Login", new { area = "Identity" });
+                return RedirectToAction("/Account/Login", new { area = "Identity" });
             }
 
             var listings = await _itemRepository.GetListingsByUserId(user.Id);
