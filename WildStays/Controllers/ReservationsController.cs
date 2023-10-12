@@ -119,7 +119,7 @@ namespace WildStays.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return RedirectToAction("/Account/Login", new { area = "Identity" });
+                return RedirectToRoute("Identity/Account/Login");
             }
 
             var reservations = await _itemRepository.GetReservationByUserId(user.Id);
