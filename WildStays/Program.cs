@@ -29,6 +29,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
+// Fixes login path when using the Identity area for user authentication.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+});
+
 // Configure logger
 var loggerConfiguration = new LoggerConfiguration()
     .MinimumLevel.Information()

@@ -114,7 +114,17 @@ namespace WildStays.Controllers
                 return RedirectToAction("Details", new { id = listingId });
             }
         }
+        [Authorize]
+        public async Task<IActionResult> UserReservations()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToRoute("Identity/Account/Login");
+            }
 
-
+            var reservations = await _itemRepository.GetReservationByUserId(user.Id);
+            return View(reservations);
+        }
     }
 }

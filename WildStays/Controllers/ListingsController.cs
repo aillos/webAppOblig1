@@ -39,7 +39,7 @@ namespace WildStays.Controllers
             //If a user is not logged in
             if (user == null)
             {
-                new RedirectToPageResult("/Account/Login", new { area = "Identity" });
+                return RedirectToRoute("Identity/Account/Login");
             }
             //Gets all the listings for a user.
             var listings = await _itemRepository.GetListingsByUserId(user.Id);
@@ -83,7 +83,7 @@ namespace WildStays.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    return new RedirectToPageResult("/Account/Login", new { area = "Identity" });
+                    return RedirectToRoute("Identity/Account/Login");
                 }
 
                 // Check if the start date is after today's date

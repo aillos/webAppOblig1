@@ -1,0 +1,25 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WildStays.DAL;
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@model IEnumerable<WildStays.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Your Reservations";
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <h1>Your Reservations</h1>
+
+    @foreach (var item in Model)
+    {
+      <p>@item.Listing.Name, @item.Listing.EndDate</p>
+    }
+}
+else
+{
+    <h1>not logged in.</h1>
+}
