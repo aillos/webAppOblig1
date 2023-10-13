@@ -120,9 +120,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Bathrooms)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -153,9 +150,6 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Bathrooms)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Image)
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

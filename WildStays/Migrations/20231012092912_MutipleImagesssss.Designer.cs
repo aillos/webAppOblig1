@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WildStays.DAL;
 
@@ -10,9 +11,11 @@ using WildStays.DAL;
 namespace WildStays.Migrations
 {
     [DbContext(typeof(DatabaseDbContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20231012092912_MutipleImagesssss")]
+    partial class MutipleImagesssss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
@@ -224,26 +227,6 @@ namespace WildStays.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WildStays.Models.Image", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
-
-                    b.ToTable("Images");
-                });
-
             modelBuilder.Entity("WildStays.Models.Listing", b =>
                 {
                     b.Property<int>("Id")
@@ -370,17 +353,6 @@ namespace WildStays.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WildStays.Models.Image", b =>
-                {
-                    b.HasOne("WildStays.Models.Listing", "Listing")
-                        .WithMany("Images")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Listing");
-                });
-
             modelBuilder.Entity("WildStays.Models.Reservation", b =>
                 {
                     b.HasOne("WildStays.Models.Listing", "Listing")
@@ -390,11 +362,6 @@ namespace WildStays.Migrations
                         .IsRequired();
 
                     b.Navigation("Listing");
-                });
-
-            modelBuilder.Entity("WildStays.Models.Listing", b =>
-                {
-                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

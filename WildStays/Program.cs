@@ -7,6 +7,7 @@ using WildStays.DAL;
 using WildStays.Models;
 using Microsoft.AspNetCore.Identity;
 using Serilog.Events;
+using Microsoft.Extensions.Hosting.Internal;
 
 
 var builder = WebApplication.CreateBuilder(args);

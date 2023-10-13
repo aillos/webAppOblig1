@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using WildStays.Models;
 
 namespace WildStays.DAL;
@@ -6,13 +7,15 @@ namespace WildStays.DAL;
 public class ItemRepository : IItemRepository
 {
     private readonly DatabaseDbContext _db;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly ILogger<ItemRepository> _logger;
 
-    public ItemRepository(DatabaseDbContext db, ILogger<ItemRepository> logger)
+    public ItemRepository(DatabaseDbContext db, ILogger<ItemRepository> logger, IWebHostEnvironment webHostEnvironment)
     {
         _db = db;
         _logger = logger;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     //Same method as in the demo from module 6, gets all listings.
@@ -45,12 +48,51 @@ public class ItemRepository : IItemRepository
     }
 
     //Same method as in the demo from module 6, createas a listing to the database.
-    public async Task<bool> Create(Listing listing)
+    public async Task<bool> Create(Listing listing, List<IFormFile> Images)
     {
         try
         {
+            var images = new List<Image>();
+
+            foreach (var imageFile in Images)
+            {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    var image = new Image
+                    {
+                        FilePath = "/uploads/" + uniqueFileName,
+                        ListingId = listing.Id
+                    };
+
+                    images.Add(image);
+
+                    _logger.LogInformation("Image uploaded: {FilePath}, ListingId: {ListingId}", image.FilePath, image.ListingId);
+                }
+                else
+                {
+                    _logger.LogWarning("Skipped an empty image file.");
+                }
+            }
+
+            // Log the image paths in the listing
+            _logger.LogInformation("Image paths in the listing: {@ImagePaths}", images.Select(img => img.FilePath).ToList());
+
+            listing.Images = images;
+
             _db.Listings.Add(listing);
             await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Listing created successfully.");
+
             return true;
         }
         catch (Exception e)
@@ -59,6 +101,8 @@ public class ItemRepository : IItemRepository
             return false;
         }
     }
+
+
 
     //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
     public async Task<bool> Update(Listing listing)
@@ -222,7 +266,7 @@ public class ItemRepository : IItemRepository
         }
     }
 
-
+    
 
 
 

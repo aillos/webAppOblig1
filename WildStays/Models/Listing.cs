@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WildStays.Models
 {
@@ -36,10 +37,6 @@ namespace WildStays.Models
         [Range(1, int.MaxValue, ErrorMessage = "Bathrooms must be greater than 0.")]
         public int Bathrooms { get; set; }
 
-        [Required(ErrorMessage = "Please enter a valid image URL.")]
-        [Url(ErrorMessage = "Please enter a valid image URL.")]
-        public string Image { get; set; }
-
         public string UserId { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Start Date is required.")]
@@ -54,9 +51,12 @@ namespace WildStays.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime EndDate { get; set; }
 
+        public ICollection<Image> Images { get; set; }
+
+
         public Listing()
         {
-
+            Images = new List<Image>();
         }
     }
 }

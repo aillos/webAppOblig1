@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace WildStays.Controllers
 {
@@ -75,9 +76,8 @@ namespace WildStays.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create([Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
+        public async Task<IActionResult> Create(Listing listing, List<IFormFile> Images)
         {
-            //Checks model state
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -86,31 +86,36 @@ namespace WildStays.Controllers
                     return new RedirectToPageResult("/Account/Login", new { area = "Identity" });
                 }
 
-                listing.UserId = user.Id;
-
-                // Checks if the startdate is after todays date
+                // Check if the start date is after today's date
                 if (!_itemRepository.DateCheck(listing.StartDate))
                 {
                     ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
                     return View(listing);
                 }
-                //Checks if the enddate is before the startdate
+
+                // Check if the end date is before the start date
                 if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
                 {
                     ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
                     return View(listing);
                 }
-                //Creates the listing
-                bool returnOk = await _itemRepository.Create(listing);
-                
+
+
+
+                // Create the listing
+                bool returnOk = await _itemRepository.Create(listing, Images);
+         
+
                 if (returnOk)
                 {
+                    _logger.LogDebug("Image url", Images);
                     return RedirectToAction(nameof(Index));
                 }
             }
 
             return View(listing);
         }
+
 
         // GET: Listings/Edit/5
         [Authorize]

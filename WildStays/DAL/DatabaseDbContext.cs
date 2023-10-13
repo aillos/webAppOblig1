@@ -14,5 +14,6 @@ namespace WildStays.DAL
         
         public DbSet<Listing> Listings { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Image> Images { get; set; }
     }
 }

@@ -11,14 +11,14 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group">A
                 <label asp-for="Place" class="control-label"></label>
                 <select asp-for="Place" class="form-control">
                     <option value="Oslo">Oslo</option>
@@ -62,10 +62,13 @@
                 <span asp-validation-for="Bathrooms" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
+                <label asp-for="Images" class="control-label">Images</label>
+                <input type="file" asp-for="Images" multiple class="form-control" />
+                <span asp-validation-for="Images" class="text-danger"></span>
             </div>
+
+
+
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
                 <input asp-for="StartDate" class="form-control" />

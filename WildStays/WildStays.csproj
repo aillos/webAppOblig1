@@ -30,4 +30,7 @@
     <None Include="Views\Reservations\Details.cshtml" />
     <None Include="Views\Reservations\Index.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
 </Project>
