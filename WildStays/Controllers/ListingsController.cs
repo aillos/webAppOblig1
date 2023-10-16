@@ -100,11 +100,11 @@ namespace WildStays.Controllers
                     return View(listing);
                 }
 
-
-
+                //Set User Id, as this is not a field in the form
+                listing.UserId = user.Id;
                 // Create the listing
                 bool returnOk = await _itemRepository.Create(listing, Images);
-         
+
 
                 if (returnOk)
                 {
@@ -139,59 +139,39 @@ namespace WildStays.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        // GET: Listings/Edit/5
-        //Edit method with bind to all the models.
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Place,Description,Type,Price,Guests,Bedrooms,Bathrooms,Image,UserId,StartDate,EndDate")] Listing listing)
+        public async Task<IActionResult> Edit(int id, Listing listing, List<IFormFile> Images)
         {
-            try
+            if (id != listing.Id)
             {
-                //If the state of the model is valid.
-                if (ModelState.IsValid)
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var existingListing = await _itemRepository.GetItemById(listing.Id);
+
+                if (existingListing == null || existingListing.UserId != user.Id)
                 {
-                    var user = await _userManager.GetUserAsync(User);
-                    var existingListing = await _itemRepository.GetItemById(listing.Id);
-                    //Checks if the listing exists and the user made it.
-                    if (existingListing == null || existingListing.UserId != user.Id)
-                    {
-                        return Forbid();
-                    }
-                    listing.UserId = user.Id;
-
-                    // Checks if the startdate is after todays date
-                    if (!_itemRepository.DateCheck(listing.StartDate))
-                    {
-                        ModelState.AddModelError("StartDate", "Start Date cannot be before today's date.");
-                        return View(listing);
-                    }
-
-                    // Checks if the enddate is before the startdate
-                    if (!_itemRepository.StartEndCheck(listing.StartDate, listing.EndDate))
-                    {
-                        ModelState.AddModelError("EndDate", "End Date cannot be before Start Date.");
-                        return View(listing);
-                    }
-                    //Updates the listing
-                    bool returnOk = await _itemRepository.Update(listing);
-
-                    if (returnOk)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        // Sends 
-                        TempData["ErrorMessage"] = "Failed to update the listing. Please try again later.";
-                    }
+                    return Forbid();
                 }
-                // If ModelState is not valid, return the view with validation errors
-                return View(listing);
+
+                // Update the UserId to ensure it matches the current user
+                listing.UserId = user.Id;
+
+                // Call the repository's Update method
+                bool returnOk = await _itemRepository.Update(listing, Images);
+
+                if (returnOk)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to update the listing. Please try again later.";
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError("An error occurred while editing the listing: {ex}", ex);
-                TempData["ErrorMessage"] = "An error occurred while editing the listing. Please try again later.";
-                return RedirectToAction("Details", new { id = id });
-            }
+            return View(listing);
         }
 
 

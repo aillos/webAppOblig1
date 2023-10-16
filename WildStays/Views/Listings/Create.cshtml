@@ -67,7 +67,11 @@
                 <span asp-validation-for="Images" class="text-danger"></span>
             </div>
 
+            <div id="image-inputs">
+                <!-- This is where the dynamic image input fields will be generated -->
+            </div>
 
+            <button type="button" id="add-image-input" class="btn btn-primary">Add More Images</button>
 
             <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
@@ -92,4 +96,20 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var imageInputs = $("#image-inputs");
+            var addImageInputButton = $("#add-image-input");
+
+            addImageInputButton.click(function () {
+                var input = '<div class="form-group">' +
+                    '<input type="file" name="Images" class="form-control" multiple />' +
+                    '</div>';
+
+                imageInputs.append(input);
+            });
+        });
+    </script>
+</section>
 }

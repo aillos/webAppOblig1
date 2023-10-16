@@ -9,12 +9,14 @@ public interface IItemRepository
     Task<IEnumerable<Listing>> GetListingsByUserId(string userId);
     Task<IEnumerable<Reservation>> GetReservationByUserId(string userId);
     Task<bool> Create(Listing listing, List<IFormFile> Images);
-    Task<bool> Update(Listing listing);
+    Task<bool> Update(Listing listing, List<IFormFile> Images);
     Task<bool> Delete(int id);
     Task<bool> CreateReservation(Reservation reservation);
     bool DateCheck(DateTime startDate);
     bool StartEndCheck(DateTime startDate, DateTime endDate);
     Task<IEnumerable<Listing>> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms,int? MinPrice, int? MaxPrice );
+
+
 
 }
 

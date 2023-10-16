@@ -105,21 +105,77 @@ public class ItemRepository : IItemRepository
 
 
     //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
-    public async Task<bool> Update(Listing listing)
+    public async Task<bool> Update(Listing listing, List<IFormFile> Images)
     {
         try
         {
-            // Detaches listing if it is being tracked.
-            var existingListing = await _db.Listings.FindAsync(listing.Id);
-            if (existingListing != null)
+            var existingListing = await _db.Listings.Include(l => l.Images).FirstOrDefaultAsync(l => l.Id == listing.Id);
+            if (existingListing == null)
             {
-                _db.Entry(existingListing).State = EntityState.Detached;
+                // Log that the existing listing was not found
+                _logger.LogError("[ItemRepository] Existing listing not found for Id: {ListingId}", listing.Id);
+                return false;
             }
 
-            // Attach the listing again.
-            _db.Entry(listing).State = EntityState.Modified;
+            // Log the existing images before the update
+            _logger.LogInformation("Existing images before update: {@ExistingImages}", existingListing.Images);
 
+            // Update the properties of the existing listing with the new values
+            existingListing.Name = listing.Name;
+            existingListing.Place = listing.Place;
+            existingListing.Description = listing.Description;
+            existingListing.Type = listing.Type;
+            existingListing.Price = listing.Price;
+            existingListing.Guests = listing.Guests;
+            existingListing.Bedrooms = listing.Bedrooms;
+            existingListing.Bathrooms = listing.Bathrooms;
+            existingListing.StartDate = listing.StartDate;
+            existingListing.EndDate = listing.EndDate;
+
+            // Log the new images before the update
+            _logger.LogInformation("New images before update: {@NewImages}", Images);
+
+            // Handle image updates
+            var newImages = new List<Image>();
+
+            foreach (var imageFile in Images)
+            {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    var image = new Image
+                    {
+                        FilePath = "/uploads/" + uniqueFileName,
+                        ListingId = existingListing.Id
+                    };
+
+                    newImages.Add(image);
+
+                    _logger.LogInformation("Image uploaded: {FilePath}, ListingId: {ListingId}", image.FilePath, image.ListingId);
+                }
+                else
+                {
+                    _logger.LogWarning("Skipped an empty image file.");
+                }
+            }
+
+            // Log the new images after the update
+            _logger.LogInformation("New images after update: {@NewImages}", newImages);
+
+            // Update the existing images with the new ones
+            existingListing.Images = newImages;
+
+            // Save the changes to the database
             await _db.SaveChangesAsync();
+
             return true;
         }
         catch (Exception e)
@@ -128,6 +184,9 @@ public class ItemRepository : IItemRepository
             return false;
         }
     }
+
+
+
 
     //Same method as in the demo from module 6, deletes a listing.
     public async Task<bool> Delete(int id)
@@ -230,7 +289,7 @@ public class ItemRepository : IItemRepository
         try
         {
             //Includes all listings if no filters, as true is always true.
-            var query = _db.Listings.Where(l => true); 
+            var query = _db.Listings.Where(l => true);
 
             //If the guest filter is in use, a lamda expression only fetches listings that have that amount of guests or more.
             //All under uses the same logic
@@ -266,10 +325,9 @@ public class ItemRepository : IItemRepository
         }
     }
 
-    
+
 
 
 
 
 }
-
