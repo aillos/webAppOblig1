@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using WildStays.Models;
 
 namespace WildStays.DAL;
@@ -105,20 +106,15 @@ public class ItemRepository : IItemRepository
 
 
     //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
-    public async Task<bool> Update(Listing listing, List<IFormFile> Images)
+    public async Task<bool> Update(Listing listing)
     {
         try
         {
-            var existingListing = await _db.Listings.Include(l => l.Images).FirstOrDefaultAsync(l => l.Id == listing.Id);
+            var existingListing = await _db.Listings.FirstOrDefaultAsync(l => l.Id == listing.Id);
             if (existingListing == null)
             {
-                // Log that the existing listing was not found
-                _logger.LogError("[ItemRepository] Existing listing not found for Id: {ListingId}", listing.Id);
                 return false;
             }
-
-            // Log the existing images before the update
-            _logger.LogInformation("Existing images before update: {@ExistingImages}", existingListing.Images);
 
             // Update the properties of the existing listing with the new values
             existingListing.Name = listing.Name;
@@ -132,47 +128,6 @@ public class ItemRepository : IItemRepository
             existingListing.StartDate = listing.StartDate;
             existingListing.EndDate = listing.EndDate;
 
-            // Log the new images before the update
-            _logger.LogInformation("New images before update: {@NewImages}", Images);
-
-            // Handle image updates
-            var newImages = new List<Image>();
-
-            foreach (var imageFile in Images)
-            {
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(fileStream);
-                    }
-
-                    var image = new Image
-                    {
-                        FilePath = "/uploads/" + uniqueFileName,
-                        ListingId = existingListing.Id
-                    };
-
-                    newImages.Add(image);
-
-                    _logger.LogInformation("Image uploaded: {FilePath}, ListingId: {ListingId}", image.FilePath, image.ListingId);
-                }
-                else
-                {
-                    _logger.LogWarning("Skipped an empty image file.");
-                }
-            }
-
-            // Log the new images after the update
-            _logger.LogInformation("New images after update: {@NewImages}", newImages);
-
-            // Update the existing images with the new ones
-            existingListing.Images = newImages;
-
             // Save the changes to the database
             await _db.SaveChangesAsync();
 
@@ -181,6 +136,72 @@ public class ItemRepository : IItemRepository
         catch (Exception e)
         {
             _logger.LogError("[ItemRepository] failed to update the listing {@listing}, error message: {e}", listing, e.Message);
+            return false;
+        }
+    }
+
+    public async Task<bool> ManageImages(Listing listing, List<IFormFile> newImages, int? imageToDeleteId)
+    {
+        try
+        {
+            var existingListing = await _db.Listings.Include(l => l.Images).FirstOrDefaultAsync(l => l.Id == listing.Id);
+            if (existingListing == null)
+            {
+                return false;
+            }
+            //If the delete button is used
+            if (imageToDeleteId.HasValue)
+            {
+                // Delete images
+                var imageToDelete = existingListing.Images.First(img => img.Id == imageToDeleteId);
+                //Path to the uploads folder
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath);
+                if (imageToDelete != null)
+                {;
+                    //Deletes the picture from the uploads folder
+                    File.Delete(uploadsFolder + imageToDelete.FilePath);
+                    //Deletes from the database
+                    existingListing.Images.Remove(imageToDelete);
+                }
+            }
+
+            if (newImages != null && newImages.Count > 0)
+            {
+                // Handle image upload
+                var imagesToAdd = new List<Image>();
+
+                foreach (var imageFile in newImages)
+                {
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(fileStream);
+                        }
+
+                        var image = new Image
+                        {
+                            FilePath = "/uploads/" + uniqueFileName,
+                            ListingId = existingListing.Id
+                        };
+
+                        imagesToAdd.Add(image);
+                    }
+                }
+
+                existingListing.Images.AddRange(imagesToAdd);
+            }
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] failed to manage images for listing ID {ListingId:0000}, error message: {e}", listing.Id, e.Message);
             return false;
         }
     }
@@ -225,6 +246,8 @@ public class ItemRepository : IItemRepository
             return null;
         }
     }
+
+
     //Method to get reservations by user id.
     public async Task<IEnumerable<Reservation>?> GetReservationByUserId(string userId)
     {
@@ -239,6 +262,19 @@ public class ItemRepository : IItemRepository
             return null;
         }
 
+    }
+    public async Task<IEnumerable<Image>> GetImagesByListingId(int listingId)
+    {
+        try
+        {
+            // Use EF Core to query the Images with the specified ListingId
+            return await _db.Images.Where(i => i.ListingId == listingId).ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] Failed to get images by ListingId {ListingId:0000}, error message: {e}", listingId, e.Message);
+            return null;
+        }
     }
 
 
