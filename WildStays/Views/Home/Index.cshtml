@@ -1,3 +1,90 @@
+@model IEnumerable<WildStays.Models.Reservation>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.css' />
+<link rel="stylesheet" href="~/css/site.css">
+<style>
+    #calendar {
+        justify-self:center;
+        width: 400px;
+        height:300px;
+        color: white;
+        margin-left: 33%;
+        border: 1px solid rgb(222,222,222,0.6);
+        border-radius: 2%;
+        margin-bottom: 40px;
+        margin-top:-70px;
+        background-color: rgb(222,222,222,0.2);
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchButton = document.getElementById("searchButton");
+    const textInput = document.getElementById("search");
+    var allEvents = []; 
+
+    @foreach (var item in Model)
+    {
+        var endDate = item.EndDate.AddDays(1);
+        <text>
+        allEvents.push({
+            title: 'Listing: @item.ListingId',
+            start: '@item.StartDate.ToString("yyyy-MM-dd")',
+            end: '@endDate.ToString("yyyy-MM-dd")',
+            display: 'background',
+            color: 'red',
+            place: '@item.Place' 
+        });
+        </text>
+    }
+    var selectedDates = [];
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        fixedWeekCount: false, 
+        timeFormat: 'H(:mm)', 
+        displayEventTime: false,
+        
+dateClick: function(info) {
+    var clickedDate = new Date(info.dateStr);
+    var eventsOnDate = calendar.getEvents().filter(event => {
+        var eventStart = new Date(event.start);
+        var eventEnd = new Date(event.end);
+        return clickedDate >= eventStart && clickedDate < eventEnd && event.backgroundColor === 'red';
+    });
+
+    if (eventsOnDate.length === 0) { // No red events on this date
+        if (selectedDates.length < 2) {
+            selectedDates.push(info.dateStr);
+        } else {
+            selectedDates = [info.dateStr];
+        }
+        alert('Selected Dates: ' + selectedDates.join(', '));
+    } else {
+        alert('This date already has a red event!');
+    }
+    }
+    });
+
+    calendar.render();
+
+    searchButton.addEventListener('click', () => {
+        var searchTerm = textInput.value; 
+
+        calendar.removeAllEvents();
+
+        var filteredEvents = allEvents.filter(event => event.place === searchTerm);
+
+        filteredEvents.forEach(event => {
+            calendar.addEvent(event);
+        });
+
+    });
+});
+
+
+</script>
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -5,18 +92,16 @@
 <div class="backgroundHome">
     <div class="background2">
     <div class="searchBar">
-        <input type="search" id="search" name="Search">
+<select id="search" name="Search" style="margin-top: 60px; width: 270px; margin-bottom: -50px; border-radius: 15px; padding: 2px 5px; height: 30px; background-color: #f5f5f5; border: 1px solid #ccc;">
+        <option value="">Select a Place</option>
+        <option value="Oslo">Oslo</option>
+        <option value="Bergen">Bergen</option>
+        <option value="Trondheim">Trondheim</option>
+    </select>
         <button id="searchButton">Search</button><br />
-            <label for="From" id="label1" style="color:white; opacity:0;">From:</label> 
-            <label for="To" id="label2" style="color:white; margin-left:140px;opacity:0;">To:</label> <br />
-
-            <input type="datetime-local"
-                    id="additional1" name="Additional" style="opacity:0" value="From"/>
-            
-            <input type="datetime-local"
-                   id="additional2" name="Additional" style="opacity:0" value="To"/>
+            </div>
     </div>
-    </div>
+    <div id="calendar"></div>
 
     <div class="bilder">
     <div class="slide-container">
@@ -54,4 +139,3 @@
     <br />
     <br />
 </div>
-

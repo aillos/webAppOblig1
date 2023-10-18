@@ -24,5 +24,7 @@ namespace WildStays.Models
         public Listing Listing { get; set; }
 
         public string UserId { get; set; }
+        
+        public string Place { get; set; }
     }
 }

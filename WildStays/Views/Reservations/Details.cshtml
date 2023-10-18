@@ -65,6 +65,7 @@
 <h2>Make a Reservation</h2>
 <form asp-action="CreateReservation" method="post">
     <input type="hidden" name="listingId" value="@Model.Id" />
+    <input type="hidden" name="Place" value="@Model.Place" />
     <div class="form-group">
         <label for="StartDate">Start Date:</label>
         <input type="date" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>

@@ -379,7 +379,33 @@ public class ItemRepository : IItemRepository
     }
 
 
+    public async Task<IEnumerable<Reservation>> GetReservations()
+    {
+        try
+        {
+            return await _db.Reservations.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] reservations ToListAsync() failed when GetReservations(), error message: {e}", e.Message);
+            return null;
+        }
+    }
+    
+    
+    public async Task<IEnumerable<Reservation>?> GetReservationByPlace(string place)
+    {
+        try
+        {
+            return await _db.Reservations.Where(l => l.Place == place).ToListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] Failed to find the reservation based on Place error message: {e}", e.Message);
+            return null;
+        }
 
+    }
 
 
 
