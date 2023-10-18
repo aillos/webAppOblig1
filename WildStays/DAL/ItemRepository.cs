@@ -209,19 +209,26 @@ public class ItemRepository : IItemRepository
 
 
 
-    //Same method as in the demo from module 6, deletes a listing.
     public async Task<bool> Delete(int id)
     {
         try
         {
             var listing = await _db.Listings.FindAsync(id);
+
             if (listing == null)
             {
                 _logger.LogError("[ItemRepository] could not find the item with item Id {ItemId:0000}", id);
                 return false;
             }
 
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            
+            // Remove associated images first
+            _db.Images.RemoveRange(listing.Images);
+
+            // Remove the listing
             _db.Listings.Remove(listing);
+
             await _db.SaveChangesAsync();
             return true;
         }
@@ -231,6 +238,7 @@ public class ItemRepository : IItemRepository
             return false;
         }
     }
+
 
     //Method to get a listing by userId, used to show only show a user their listings
     public async Task<IEnumerable<Listing>?> GetListingsByUserId(string userId)

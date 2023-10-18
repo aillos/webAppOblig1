@@ -278,7 +278,8 @@ namespace WildStays.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var listing = await _itemRepository.GetItemById(id);
-            //Checks that listing exists, and the user is the same user that made the listing.
+
+            // Checks that listing exists, and the user is the same user that made the listing.
             if (listing == null)
             {
                 return NotFound();
@@ -288,9 +289,11 @@ namespace WildStays.Controllers
             {
                 return Forbid();
             }
-            //Method to delete reservation
+
+            // Method to delete reservation
             bool returnOk = await _itemRepository.Delete(id);
-            //If there was a problem deleting the reservation.
+
+            // If there was a problem deleting the reservation.
             if (!returnOk)
             {
                 _logger.LogError("[ListingsController] Listing deletion failed for the Id {Id:0000}", id);
@@ -299,6 +302,8 @@ namespace WildStays.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+
 
         // GET: Listings/MyReservations
         //Controller to show the user their reservations.
