@@ -39,10 +39,27 @@ namespace WildStays.Controllers
             return View(listings);
         }
 
+        // Grid
+        public async Task<IActionResult> Grid(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
+        {
+            var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms, MinPrice, MaxPrice);
 
+            return View(listings);
+        }
 
         // Detail action, same as in listingscontroller, but has reservations in it
         public async Task<IActionResult> Details(int id)
+        {
+            var listing = await _itemRepository.GetItemById(id);
+            if (listing == null)
+            {
+                return NotFound();
+            }
+            return View(listing);
+        }
+
+        // GDetails
+        public async Task<IActionResult> GDetails(int id)
         {
             var listing = await _itemRepository.GetItemById(id);
             if (listing == null)

@@ -1,0 +1,203 @@
+﻿@model IEnumerable<WildStays.Models.Listing>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JavaScript (Popper.js and Bootstrap JS) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>
+
+
+<style>
+    .row {
+        grid-column-gap: 15px;
+        grid-row-gap: 30px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .col {
+        max-width: 350px;
+    }
+
+    .roundedImage {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 10px;
+        position: relative;
+        width: 250px;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .card {
+        background-color: lightgrey;
+        padding: 20px;
+    }
+
+    h1 {
+        padding-bottom: 30px;
+    }
+
+    .carousel-indicators [data-bs-target] {
+        border-radius: 100%;
+        width: 15px;
+        height: 15px;
+    }
+
+    .carousel-item {
+        height: 300px;
+    }
+</style>
+
+
+<form asp-action="Grid" method="get">
+    <div class="form-group">
+        <label for="AmountPeople">Filter by Number of Guests:</label>
+        <select name="AmountPeople" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+
+        <label for="AmountBathrooms">Filter by Number of Bathrooms:</label>
+        <select name="AmountBathrooms" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+
+        <label for="AmountBedrooms">Filter by Number of Bedrooms:</label>
+        <select name="AmountBedrooms" class="form-control">
+            <option value="">All</option>
+            <option value="1">1 or more</option>
+            <option value="2">2 or more</option>
+            <option value="3">3 or more</option>
+            <option value="4">4 or more</option>
+            <option value="5">5 or more</option>
+            <option value="6">6 or more</option>
+            <option value="7">7 or more</option>
+            <option value="8">8 or more</option>
+            <option value="9">9 or more</option>
+            <option value="10">10 or more</option>
+            <option value="11">11 or more</option>
+            <option value="12">12 or more</option>
+            <option value="13">13 or more</option>
+            <option value="14">14 or more</option>
+            <option value="15">15 or more</option>
+            <option value="16">16 or more</option>
+            <option value="17">17 or more</option>
+            <option value="18">18 or more</option>
+            <option value="19">19 or more</option>
+            <option value="20">20 or more</option>
+        </select>
+        <p>
+            Filter by minimum price: <input type="text" name="MinPrice" value="@ViewData["CurrentFilter"]" />
+        </p>
+        <p>
+            Filter by maximum price: <input type="text" name="MaxPrice" value="@ViewData["CurrentFilter"]" />
+        </p>
+
+
+    </div>
+    <button type="submit" class="btn btn-primary">Apply Filter</button>
+</form>
+
+
+
+
+<h1>Listings of available housing</h1>
+
+<div class="row">
+    @foreach (var listing in Model)
+    {
+        <div class="col">
+            <div class="card">
+                <div id="@("listing"+listing.Id)" class="carousel slide" data-bs-interval="false">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+                    <a asp-action="GDetails"
+                       asp-route-id="@listing.Id">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="@listing.Images" class="roundedImage" alt="Image 1">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="@listing.Images" class="roundedImage" alt="Image 2">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="@listing.Images" class="roundedImage" alt="Image 3">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="@listing.Images" class="roundedImage" alt="Image 4">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="@listing.Images" class="roundedImage" alt="Image 5">
+                            </div>
+                        </div>
+                    </a>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div>
+                    <div class="text-center">
+                        <h5>
+                            @listing.Name
+                        </h5>
+                        <h5>
+                            @listing.Price.ToString("0.00 NOK")
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
