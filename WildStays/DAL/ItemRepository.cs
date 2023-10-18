@@ -208,7 +208,6 @@ public class ItemRepository : IItemRepository
 
 
 
-
     public async Task<bool> Delete(int id)
     {
         try
@@ -221,10 +220,20 @@ public class ItemRepository : IItemRepository
                 return false;
             }
 
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-            
-            // Remove associated images first
-            _db.Images.RemoveRange(listing.Images);
+            // Gets images based on the listing id
+            var images = await GetImagesByListingId(id);
+            //Gets the fullpath
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath);
+            // Goes through all files belonging to the listing
+            foreach (var image in images)
+            {
+                //Deletes files
+                File.Delete(uploadsFolder + image.FilePath);
+                
+            }
+
+            // Remove the images from the database
+            _db.Images.RemoveRange(images);
 
             // Remove the listing
             _db.Listings.Remove(listing);

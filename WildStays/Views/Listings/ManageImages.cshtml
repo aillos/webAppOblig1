@@ -9,16 +9,15 @@
 <form asp-action="ManageImages" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Images" class="control-label">Images</label>
-        <input type="file" asp-for="Images" multiple class="form-control" />
+        <input type="file" asp-for="Images" multiple class="form-control" multiple accept="image/*" />
         <span asp-validation-for="Images" class="text-danger"></span>
     </div>
 
-    <div id="image-inputs">
-        <!-- Were new images are added -->
+    <div id="image-inputs" multiple accept="image/*">
+        <!-- This is where the dynamic image input fields will be generated -->
     </div>
 
     <button type="button" id="add-image-input" class="btn btn-primary">Add More Images</button>
-
 
     <h2>Images for @Model.Id</h2>
     <div class="image-container">
@@ -36,13 +35,10 @@
     </div>
 </form>
 
-
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    
+    }
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -58,5 +54,4 @@
             });
         });
     </script>
-}
 }

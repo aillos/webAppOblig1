@@ -51,8 +51,9 @@ namespace WildStays.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime EndDate { get; set; }
 
+        [DataType(DataType.ImageUrl)]
+        [FileExtensions(Extensions = "jpg,jpeg,png,gif", ErrorMessage = "Please select a valid image file.")]
         public ICollection<Image> Images { get; set; }
-
 
         public Listing()
         {

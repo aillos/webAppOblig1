@@ -63,11 +63,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="Images" class="control-label">Images</label>
-                <input type="file" asp-for="Images" multiple class="form-control" />
+                <input type="file" asp-for="Images" multiple class="form-control" multiple accept="image/*" />
                 <span asp-validation-for="Images" class="text-danger"></span>
             </div>
 
-            <div id="image-inputs">
+            <div id="image-inputs" multiple accept="image/*">
                 <!-- This is where the dynamic image input fields will be generated -->
             </div>
 
