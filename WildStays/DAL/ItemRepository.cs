@@ -149,18 +149,13 @@ public class ItemRepository : IItemRepository
             {
                 return false;
             }
-            //If the delete button is used
+
             if (imageToDeleteId.HasValue)
             {
-                // Delete images
-                var imageToDelete = existingListing.Images.First(img => img.Id == imageToDeleteId);
-                //Path to the uploads folder
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath);
+                // Delete image
+                var imageToDelete = existingListing.Images.FirstOrDefault(img => img.Id == imageToDeleteId);
                 if (imageToDelete != null)
-                {;
-                    //Deletes the picture from the uploads folder
-                    File.Delete(uploadsFolder + imageToDelete.FilePath);
-                    //Deletes from the database
+                {
                     existingListing.Images.Remove(imageToDelete);
                 }
             }

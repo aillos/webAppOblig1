@@ -209,7 +209,7 @@ namespace WildStays.Controllers
             {
                 if (!string.IsNullOrEmpty(saveImages))
                 {
-                    // If the user clicks the save button
+                    // User clicked "Save Images" button
                     var result = await _itemRepository.ManageImages(existingListing, Images, null);
 
                     if (result)
@@ -224,13 +224,12 @@ namespace WildStays.Controllers
                 }
                 else if (deleteImage.HasValue)
                 {
-                    // Action if the user wants to delete image
+                    // User clicked "Delete" button for an image
                     var result = await _itemRepository.ManageImages(existingListing, null, deleteImage);
 
                     if (result)
                     {
                         _logger.LogInformation("Image deleted successfully for listing ID: {ListingId}. Redirecting to ManageImages.", id);
-                        // Redirect to the same ManageImages action to refresh the view
                         return RedirectToAction("ManageImages", new { id = existingListing.Id });
                     }
                     else

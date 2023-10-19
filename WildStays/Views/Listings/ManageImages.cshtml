@@ -9,15 +9,23 @@
 <form asp-action="ManageImages" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label asp-for="Images" class="control-label">Images</label>
-        <input type="file" asp-for="Images" multiple class="form-control" multiple accept="image/*" />
+        <input type="file" asp-for="Images" multiple class="form-control" />
         <span asp-validation-for="Images" class="text-danger"></span>
     </div>
 
-    <div id="image-inputs" multiple accept="image/*">
-        <!-- This is where the dynamic image input fields will be generated -->
+    <div id="image-inputs">
+        <!-- Where new images are added -->
     </div>
 
     <button type="button" id="add-image-input" class="btn btn-primary">Add More Images</button>
+
+    <!-- Hidden input field template for dynamic validation -->
+    <div style="display: none">
+        <div class="form-group" id="dynamic-image-input-template">
+            <input type="file" asp-for="Images" class="form-control" multiple />
+            <span asp-validation-for="Images" class="text-danger"></span>
+        </div>
+    </div>
 
     <h2>Images for @Model.Id</h2>
     <div class="image-container">
@@ -44,13 +52,10 @@
         $(document).ready(function () {
             var imageInputs = $("#image-inputs");
             var addImageInputButton = $("#add-image-input");
+            var dynamicImageInputTemplate = $("#dynamic-image-input-template").html();
 
             addImageInputButton.click(function () {
-                var input = '<div class="form-group">' +
-                    '<input type="file" name="Images" class="form-control" multiple />' +
-                    '</div>';
-
-                imageInputs.append(input);
+                imageInputs.append(dynamicImageInputTemplate);
             });
         });
     </script>
