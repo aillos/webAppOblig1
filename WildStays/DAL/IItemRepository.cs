@@ -21,6 +21,7 @@ public interface IItemRepository
     Task<IEnumerable<Listing>> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms,int? MinPrice, int? MaxPrice );
 
     Task<IEnumerable<Reservation>> GetReservations();
+    Task<IEnumerable<Reservation>> GetReservationsByListingId(int listingId);
     
     
 }
