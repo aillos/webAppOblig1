@@ -402,6 +402,12 @@ public class ItemRepository : IItemRepository
 
     }
 
+    public async Task<IEnumerable<Reservation>> GetReservationsByListingId(int listingId)
+    {
+        return await _db.Reservations.Where(r => r.ListingId == listingId).ToListAsync();
+    }
+
+
 
 
 }
