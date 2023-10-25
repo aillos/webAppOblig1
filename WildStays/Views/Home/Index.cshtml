@@ -2,87 +2,87 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
 <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.css' />
-<link rel="stylesheet" href="~/css/site.css">
+<link rel="stylesheet" href="./css/site.css">
 <style>
-    #calendar {
-        justify-self:center;
-        width: 400px;
-        height:300px;
-        color: white;
-        margin-left: 33%;
-        border: 1px solid rgb(222,222,222,0.6);
-        border-radius: 2%;
-        margin-bottom: 40px;
-        margin-top:-70px;
-        background-color: rgb(222,222,222,0.2);
-    }
+    
+    /*Setter margin og padding til body til 0 for å unngå whiteline i bunnen og unødvendig scrolle mulighet.*/
+    body{
+    margin:0px;
+    padding:0px;
+}
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchButton = document.getElementById("searchButton");
-    const textInput = document.getElementById("search");
-    var allEvents = []; 
-
-    @foreach (var item in Model)
-    {
-        var endDate = item.EndDate.AddDays(1);
-        <text>
-        allEvents.push({
-            title: 'Listing: @item.ListingId',
-            start: '@item.StartDate.ToString("yyyy-MM-dd")',
-            end: '@endDate.ToString("yyyy-MM-dd")',
-            display: 'background',
-            color: 'red',
-            place: '@item.Place' 
-        });
-        </text>
-    }
-    var selectedDates = [];
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        fixedWeekCount: false, 
-        timeFormat: 'H(:mm)', 
-        displayEventTime: false,
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchButton = document.getElementById("searchButton");
+        const textInput = document.getElementById("search");
         
-dateClick: function(info) {
-    var clickedDate = new Date(info.dateStr);
-    var eventsOnDate = calendar.getEvents().filter(event => {
-        var eventStart = new Date(event.start);
-        var eventEnd = new Date(event.end);
-        return clickedDate >= eventStart && clickedDate < eventEnd && event.backgroundColor === 'red';
-    });
+        //Henter ut events fra reservations (model).
+        var allEvents = @Html.Raw(Json.Serialize(Model.Select(item => new {
+            title = "Listing: " + item.ListingId,
+            start = item.StartDate.ToString("yyyy-MM-dd"),
+            end = item.EndDate.AddDays(1).ToString("yyyy-MM-dd"),
+            display = "background",
+            color = "red",
+            place = item.Place
+            })));
 
-    if (eventsOnDate.length === 0) { // No red events on this date
-        if (selectedDates.length < 2) {
-            selectedDates.push(info.dateStr);
-        } else {
-            selectedDates = [info.dateStr];
-        }
-        alert('Selected Dates: ' + selectedDates.join(', '));
-    } else {
-        alert('This date already has a red event!');
-    }
-    }
-    });
+        //Instillinger for kalender, både layout, om den skal være mulig å trykke på, at tiden på dagen ikke skal vises osv.
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            fixedWeekCount: false,
+            timeFormat: 'H(:mm)',
+            displayEventTime: false,
+            selectable: true, 
+            unselect: function () {
+                var datesDiv = document.getElementById('dates');
+                datesDiv.innerHTML = '';
+            },
 
-    calendar.render();
+            //Setter kalender events til bakgrunnsfarge rød så bruker vet at de er opptatt og kan inneholde færre alternativer ved søk.
+            select: function (info) {
+                var eventsDuringSelection = calendar.getEvents().filter(event => {
+                    var eventStart = new Date(event.start);
+                    var eventEnd = new Date(event.end);
+                    return eventStart < info.end && eventEnd > info.start && event.backgroundColor === 'red';
+                });
+                
+                //Dersom du ikke velger en reservert dato. Oppdaterer verdiene og oppdaterer dato feltet under kalenderen.
+                document.getElementById('startDateInput').value = info.startStr;
+                document.getElementById('endDateInput').value = info.endStr;
+                var datesDiv = document.getElementById('dates');
+                datesDiv.innerHTML = `Selected dates: ${info.startStr} to ${info.endStr}`;
+                
+                if (eventsDuringSelection.length !== 0) {
+                    //Dersom du velger en reservert dato, varsler isåfall om dette.
+                    alert('Selection includes a reserved date!');
+                }
 
-    searchButton.addEventListener('click', () => {
-        var searchTerm = textInput.value; 
-
-        calendar.removeAllEvents();
-
-        var filteredEvents = allEvents.filter(event => event.place === searchTerm);
-
-        filteredEvents.forEach(event => {
-            calendar.addEvent(event);
+            }
         });
 
+        //Oppretter kalenderen
+        calendar.render();
+
+        //Funksjon for å sjekke etter om søk blir foretatt.
+        searchButton.addEventListener('click', () => {
+            var searchTerm = textInput.value;
+
+            //Fjerner alle events før en setter nye. Tilfelle nytt søk. (Kunne vært en sjekk for om søk er samme eller ei evt, usikker på om det er mer effektivt eller ikke. Kommer nok veldig ann på antall reservasjoner)
+            calendar.removeAllEvents();
+
+            //Legger inn nye events basert på det nye søket.
+            var filteredEvents = allEvents.filter(event => event.place === searchTerm);
+
+            filteredEvents.forEach(event => {
+                calendar.addEvent(event);
+            });
+        });
+
+        textInput.addEventListener('change', function () {
+            document.getElementById('placeInput').value = this.value;
+        });
     });
-});
-
-
 </script>
 
 @{
@@ -91,50 +91,76 @@ dateClick: function(info) {
 
 <div class="backgroundHome">
     <div class="background2">
-    <div class="searchBar">
-<select id="search" name="Search" style="margin-top: 60px; width: 270px; margin-bottom: -50px; border-radius: 15px; padding: 2px 5px; height: 30px; background-color: #f5f5f5; border: 1px solid #ccc;">
-        <option value="">Select a Place</option>
-        <option value="Oslo">Oslo</option>
-        <option value="Bergen">Bergen</option>
-        <option value="Trondheim">Trondheim</option>
-    </select>
-        <button id="searchButton">Search</button><br />
-            </div>
-    </div>
-    <div id="calendar"></div>
-
-    <div class="bilder">
-    <div class="slide-container">
-        <span class="slider-span" id="slider-span1"></span>
-        <span class="slider-span" id="slider-span2"></span>
-        <span class="slider-span" id="slider-span3"></span>
-        <span class="slider-span" id="slider-span4"></span>
-        <span class="slider-span" id="slider-span5"></span>
-
-        <div class="image-slider">
-            <div class="slides-div" id="slide-1">
-                <img src="images/akerLeilighet.jpg" alt="" class="img" id="img1">
-                <a href="#slider-span1" class="button" id="button-1"></a>
-            </div>
-            <div class="slides-div" id="slide-2">
-                <img src="images/osloLeilighet.jpg" alt="" class="img" id="img2">
-                <a href="#slider-span2" class="button" id="button-2"></a>
-            </div>
-            <div class="slides-div" id="slide-3">
-                <img src="images/lørenskogLeilighet.jpg" alt="" class="img" id="img3">
-                <a href="#slider-span3" class="button" id="button-3"></a>
-            </div>
-            <div class="slides-div" id="slide-4">
-                <img src="images/stavangerLeilighet.jpg" alt="" class="img" id="img4">
-                <a href="#slider-span4" class="button" id="button-4"></a>
-            </div>
-            <div class="slides-div" id="slide-5">
-                <img src="images/trondheimLeilighet.jpg" alt="" class="img" id="img5">
-                <a href="#slider-span5" class="button" id="button-5"></a>
-            </div>
+        @*Stedsinput hvor bruker putter inn sted for å kunne filtrere ut fra listings og reservations.*@
+        <div class="searchBar">
+            <select id="search" name="Search">
+                <option value="">Select a Place</option>
+                <option value="Oslo">Oslo</option>
+                <option value="Bergen">Bergen</option>
+                <option value="Trondheim">Trondheim</option>
+            </select>
+            @*Utfører søk/oppdaterer kalenderen basert på stedsinnput*@
+            <button id="searchButton">Search</button><br/>
         </div>
-
+        @*Info boks for bruk av kalenderen*@
+        <div class="calendarInfo">The <strong style="color:red;">redder</strong> the date, the more listings are <strong>booked.</strong> <br /><strong>Click</strong> and <strong>drag</strong> to select dates to filter by.</div>
     </div>
+    
+    @*Plassering av kalender på siden. Kalenderen er opprettet med Javascript som vist over*@
+    <div class="dateDiv">
+        
+        <div id="calendar"></div>
+    </div>
+    @*Boks eller container for å vise hvilke datoer som er blitt valgt ut av bruker. Boksen oppdateres etterhvert som søk oppdateres.
+        Se listener i script over for mer info.*@
+    
+    <div id="dates"></div>
+    @* Videresending til reservations siden med variabler satt basert på Place value (Sted), og StartDate/EndDate (Satt i kalender)*@
+    <form action="/Reservations" method="get">
+        <input type="hidden" id="placeInput" name="Place" value="">
+        <input type="hidden" id="startDateInput" name="StartDate" value="">
+        <input type="hidden" id="endDateInput" name="EndDate" value="">
+
+        <button type="submit" class="buttonStyle">See results</button>
+    </form>
+
+    @* Bilde container, git white space for bildene over og under *@
+    <div class="bilder">
+        
+        @* Container for bilde slides, fungerer som slideshow, koden for slideshow er pur css ikke noe Javascript.
+            Hvert bilde er hentet fra mappen images. Dersom en ønsker flere bilder må også css oppdateres for å flytte korrekt avstand ved klikk.
+            For mer info se #slider-span1:target ~ .image-slider i css.*@
+        <div class="slide-container">
+            <span class="slider-span" id="slider-span1"></span>
+            <span class="slider-span" id="slider-span2"></span>
+            <span class="slider-span" id="slider-span3"></span>
+            <span class="slider-span" id="slider-span4"></span>
+            <span class="slider-span" id="slider-span5"></span>
+
+            <div class="image-slider">
+                <div class="slides-div" id="slide-1">
+                    <img src="images/akerLeilighet.jpg" alt="" class="img" id="img1">
+                    <a href="#slider-span1" class="button" id="button-1"></a>
+                </div>
+                <div class="slides-div" id="slide-2">
+                    <img src="images/osloLeilighet.jpg" alt="" class="img" id="img2">
+                    <a href="#slider-span2" class="button" id="button-2"></a>
+                </div>
+                <div class="slides-div" id="slide-3">
+                    <img src="images/lørenskogLeilighet.jpg" alt="" class="img" id="img3">
+                    <a href="#slider-span3" class="button" id="button-3"></a>
+                </div>
+                <div class="slides-div" id="slide-4">
+                    <img src="images/stavangerLeilighet.jpg" alt="" class="img" id="img4">
+                    <a href="#slider-span4" class="button" id="button-4"></a>
+                </div>
+                <div class="slides-div" id="slide-5">
+                    <img src="images/trondheimLeilighet.jpg" alt="" class="img" id="img5">
+                    <a href="#slider-span5" class="button" id="button-5"></a>
+                </div>
+            </div>
+
+        </div>
     </div>
     <br />
     <br />
