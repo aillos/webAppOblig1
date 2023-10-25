@@ -1,11 +1,70 @@
-﻿@model WildStays.Models.Listing
+@model ListingDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.css' />
+<link rel="stylesheet" href="./css/site.css">
 <h1>Details</h1>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Fetching events from reservations.
+        var allEvents = @Html.Raw(Json.Serialize(Model.Reservations.Select(item => new {
+            title="BOOKED", 
+            start = item.StartDate.ToString("yyyy-MM-dd"),
+            end = item.EndDate.AddDays(1).ToString("yyyy-MM-dd"),
+            display = "background",
+            color = "#B22222",
+        })));
+    
+        // Calendar settings.
+        var calendarEl = document.getElementById('calendar2');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            eventDidMount: function(info) {
+                    if (info.event.display === 'background') {
+                        $(info.el).css('opacity', '0.8');  
+                    }
+                },
+            initialView: 'dayGridMonth',
+            fixedWeekCount: false,
+            timeFormat: 'H(:mm)',
+            displayEventTime: false,
+            selectable: true, 
+            unselect: function () {
+                var datesDiv = document.getElementById('dates');
+                datesDiv.innerHTML = '';
+            },
+    
+            // If a reserved date is selected, notify the user.
+            select: function (info) {
+                var eventsDuringSelection = calendar.getEvents().filter(event => {
+                    var eventStart = new Date(event.start);
+                    var eventEnd = new Date(event.end);
+                    return eventStart < info.end && eventEnd > info.start && event.backgroundColor === 'red';
+                });
+                
+                if (eventsDuringSelection.length === 0) {
+                    document.getElementById('StartDate').value = info.startStr;
+                    document.getElementById('EndDate').value = info.endStr;
+                } else {
+                    alert('Selection includes a reserved date!');
+                }
+            }
+        });
+                allEvents.forEach(event => {
+                    calendar.addEvent(event);
+                });
+    
+        // Render the calendar.
+        calendar.render();
+       
+        // Add all the reservations to the calendar.
 
+    });
+
+</script>
 <div>
     @if (TempData["ErrorMessage"] != null)
     {
@@ -17,65 +76,58 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Listing.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Listing.Name)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.Listing.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
+            @Html.DisplayFor(model => model.Listing.Description)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
+            @Html.DisplayNameFor(model => model.Listing.Type)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Type)
+            @Html.DisplayFor(model => model.Listing.Type)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
+            @Html.DisplayNameFor(model => model.Listing.Price)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
+            @Html.DisplayFor(model => model.Listing.Price)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Guests)
+            @Html.DisplayNameFor(model => model.Listing.Guests)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Guests)
+            @Html.DisplayFor(model => model.Listing.Guests)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Bedrooms)
+            @Html.DisplayNameFor(model => model.Listing.Bedrooms)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Bedrooms)
+            @Html.DisplayFor(model => model.Listing.Bedrooms)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Bathrooms)
+            @Html.DisplayNameFor(model => model.Listing.Bathrooms)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Bathrooms)
+            @Html.DisplayFor(model => model.Listing.Bathrooms)
         </dd>
     </dl>
 </div>
 
-
+<div id="calendar2"></div>
 <h2>Make a Reservation</h2>
 <form asp-action="CreateReservation" method="post">
-    <input type="hidden" name="listingId" value="@Model.Id" />
-    <input type="hidden" name="Place" value="@Model.Place" />
-    <div class="form-group">
-        <label for="StartDate">Start Date:</label>
-        <input type="date" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
-    </div>
-    <div class="form-group">
-        <label for="EndDate">End Date:</label>
-        <input type="date" id="EndDate" name="EndDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
-
-    </div>
-    <button type="submit">Reserve</button>
+    <input type="hidden" name="listingId" value="@Model.Listing.Id" />
+    <input type="hidden" name="place" value="@Model.Listing.Place" />
+        <input type="hidden" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+        <input type="hidden" id="EndDate" name="EndDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+    <button type="submit" class="buttonStyle">Reserve</button>
 </form>
 <div>
 
