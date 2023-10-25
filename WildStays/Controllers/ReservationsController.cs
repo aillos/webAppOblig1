@@ -40,16 +40,27 @@ namespace WildStays.Controllers
 
 
 
-        // Detail action, same as in listingscontroller, but has reservations in it
-        public async Task<IActionResult> Details(int id)
-        {
-            var listing = await _itemRepository.GetItemById(id);
-            if (listing == null)
-            {
-                return NotFound();
-            }
-            return View(listing);
-        }
+ // Detail action, same as in listingscontroller, but has reservations in it
+     public async Task<IActionResult> Details(int id)
+     {
+         var listing = await _itemRepository.GetItemById(id);
+         if (listing == null)
+         {
+             return NotFound();
+         }
+
+         var reservations = await _itemRepository.GetReservationsByListingId(id);
+
+         var viewModel = new ListingDetailsViewModel
+         {
+             Listing = listing,
+             Reservations = reservations
+         };
+
+         return View(viewModel);
+     }
+
+        
 
         // Creates a reservation
         [Authorize]
