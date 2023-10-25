@@ -332,15 +332,18 @@ public class ItemRepository : IItemRepository
 
 
     //Adds filters so that the user can filter their view.
-    public async Task<IEnumerable<Listing>?> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
+    public async Task<IEnumerable<Listing>?> FilterListings(String? Place, int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice, DateTime? StartDate, DateTime? EndDate)
     {
         try
         {
-            //Includes all listings if no filters, as true is always true.
+            // Begin with a query that includes all listings
             var query = _db.Listings.Where(l => true);
 
-            //If the guest filter is in use, a lamda expression only fetches listings that have that amount of guests or more.
-            //All under uses the same logic
+            if (Place != null)
+            {
+                query = query.Where(l => l.Place == Place);
+            }
+
             if (AmountGuests.HasValue)
             {
                 query = query.Where(l => l.Guests >= AmountGuests);
@@ -355,13 +358,44 @@ public class ItemRepository : IItemRepository
             {
                 query = query.Where(l => l.Bedrooms >= AmountBedrooms);
             }
+
             if (MinPrice.HasValue)
             {
                 query = query.Where(l => l.Price >= MinPrice);
             }
+
             if (MaxPrice.HasValue)
             {
                 query = query.Where(l => l.Price <= MaxPrice);
+            }
+
+            List<int> reservedListingIds = new List<int>();
+
+            if (StartDate.HasValue || EndDate.HasValue)
+            {
+                if (StartDate.HasValue && EndDate.HasValue)
+                {
+                    reservedListingIds = _db.Reservations
+                        .Where(r => (StartDate.Value <= r.EndDate && EndDate.Value >= r.StartDate))
+                        .Select(r => r.ListingId)
+                        .ToList();
+                }
+                else if (StartDate.HasValue)
+                {
+                    reservedListingIds = _db.Reservations
+                        .Where(r => StartDate.Value <= r.EndDate)
+                        .Select(r => r.ListingId)
+                        .ToList();
+                }
+                else // Only EndDate has value
+                {
+                    reservedListingIds = _db.Reservations
+                        .Where(r => EndDate.Value >= r.StartDate)
+                        .Select(r => r.ListingId)
+                        .ToList();
+                }
+
+                query = query.Where(l => !reservedListingIds.Contains(l.Id));
             }
 
             return await query.ToListAsync();

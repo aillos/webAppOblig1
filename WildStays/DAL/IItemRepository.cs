@@ -18,7 +18,7 @@ public interface IItemRepository
     Task<bool> CreateReservation(Reservation reservation);
     bool DateCheck(DateTime startDate);
     bool StartEndCheck(DateTime startDate, DateTime endDate);
-    Task<IEnumerable<Listing>> FilterListings(int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms,int? MinPrice, int? MaxPrice );
+    Task<IEnumerable<Listing>> FilterListings(String? Place, int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice, DateTime? StartDate, DateTime? EndDate);
 
     Task<IEnumerable<Reservation>> GetReservations();
     Task<IEnumerable<Reservation>> GetReservationsByListingId(int listingId);

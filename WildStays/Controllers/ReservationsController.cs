@@ -31,17 +31,19 @@ namespace WildStays.Controllers
 
 
         // Index
-        public async Task<IActionResult> Index(int? AmountPeople, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice)
+        public async Task<IActionResult> Index(String? Place, int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice, DateTime? StartDate, DateTime? EndDate)
         {
-            var listings = await _itemRepository.FilterListings(AmountPeople, AmountBathrooms, AmountBedrooms, MinPrice, MaxPrice);
+            //Returnes the listings with filters, if any, see the method in Itemrepository for further information.
+            var listings = await _itemRepository.FilterListings(Place, AmountGuests, AmountBathrooms, AmountBedrooms, MinPrice, MaxPrice, StartDate, EndDate);
 
             return View(listings);
         }
 
 
 
- // Detail action, same as in listingscontroller, but has reservations in it
-     public async Task<IActionResult> Details(int id)
+
+        // Detail action, same as in listingscontroller, but has reservations in it
+        public async Task<IActionResult> Details(int id)
      {
          var listing = await _itemRepository.GetItemById(id);
          if (listing == null)
