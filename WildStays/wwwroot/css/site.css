@@ -1,11 +1,13 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    color: #06030c;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+        color: #06030c;
+    }
 }
 
 html {
@@ -14,72 +16,60 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    color: #06030c;
 }
-
+/*Søkefelt styling start */
 #searchButton {
     border-radius: 15px;
     border: none;
-    background-color: #0094ff;
-    color: white;
-    box-shadow: 0px;
+    background-color: #659DBD;
+    color: #06030c;
     padding: 1px 22px;
-    height:30px;
-
+    height: 30px;
 }
 
 .backgroundHome {
     width: 100%;
     height: 100%;
-    background-image: url("/images/bakgrunn.jpg");
+    background-image: url("https://i.imgur.com/TZd8BWo.png");
     background-repeat: repeat-y;
     background-size: cover;
-    background-color: #cccccc;
     justify-content: center;
     text-align: center;
 
 }
-#search{
-    border:none;
-}
+
 .searchBar {
-    text-align:left;
-    margin-left:35%;
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
     width: 400px;
-    height: 200px;
+    height: 150px;
     align-self: center;
     justify-self: center;
     background-color: transparent;
+    margin: auto auto 35px;
 }
 
+#searchButton {
+        flex: auto; 
+}
 
-
-
-.searchBar select {
-    margin-top: 60px;
+#search {
     width: 270px;
-    margin-bottom: -50px;
     border-radius: 15px;
     padding: 2px 5px;
     height: 30px;
-    appearance: none;
     background-color: #f5f5f5;
     border: 1px solid #ccc;
+    flex:3;
+    margin-left:10px;
 }
+/*Søkefelt styling slutt*/
 
-
-#additional1 {
-    margin-top: -25px;
-    width: 180px;
-    border: none;
-    height:30px;
-}
-#additional2 {
-    margin-top: -20px;
-    width: 180px;
-    border: none;
-    height: 30px;
-}
+/*Slideshow styling*/
 
 .bilder {
     width: 100%;
@@ -138,6 +128,9 @@ body {
     background-color: rgb(40, 40, 40, 0.7);
 
 }
+/*Slideshow styling slutt*/
+
+/*Slideshow css logikk start*/
 
 #slider-span1:target ~ .image-slider #img1,
 #slider-span1:target ~ .image-slider #button-1,
@@ -173,5 +166,198 @@ body {
 #slider-span5:target ~ .image-slider {
     left: -70%;
 }
+/*Slideshow css slutt*/
 
+.dateDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/*Kalender styling*/
+#calendar {
+    width: 400px;
+    height: 300px;
+    color: #111;
+    border: 1px solid rgb(222,222,222,0.6);
+    border-radius: 2%;
+    margin-bottom: 20px;
+    background-color: white;
+    margin-top: -35px;
+}
+
+#calendar2 {
+    width: 400px;
+    height: 300px;
+    color: #111;
+    border: 2px solid #111;
+    border-radius: 2%;
+    margin-bottom: 20px;
+    background-color: white;
+    margin-top: 10px;
+}
+
+
+.calendarInfo{
+    margin:-80px auto 45px auto;
+    text-align:center;
+    background-color:white;
+    width:380px;
+    height:38px;
+    border-radius:25px;
+    font-size:12px;
+}
+
+/*Valgte dato styling*/
+#dates {
+    background-color: white;
+    border-radius: 15px;
+    width: 350px;
+    height: 30px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/*Kalender button css styling start */
+.fc-button.fc-next-button.fc-button-primary {
+    background-color: #659DBD;
+    border-color: #659DBD;
+    color: #06030c;
+    border-radius: 15px;
+}
+
+.fc-button.fc-next-button.fc-button-primary:hover {
+        background-color: #4987ab;
+    }
+
+.fc-button.fc-next-button.fc-button-primary:focus {
+        background-color: #4987ab;
+}
+
+.fc-button.fc-next-button.fc-button-primary:active {
+        background-color: #4987ab;
+}
+
+.fc-button.fc-prev-button.fc-button-primary {
+    background-color: #659DBD;
+    border-color: #659DBD;
+    color: #06030c;
+    border-radius: 15px;
+}
+
+.fc-button.fc-prev-button.fc-button-primary:hover {
+        background-color: #659DBD;
+
+}
+
+.fc-button.fc-prev-button.fc-button-primary:focus {
+        background-color: #4987ab;
+}
+
+.fc-button.fc-prev-button.fc-button-primary:active {
+        background-color: #4987ab;
+}
+
+
+
+.fc-highlight {
+    background: green;
+    opacity: 1;
+    border: 2px solid green;
+    border-radius: 15px;
+}
+
+.fc-header-toolbar.fc-header-toolbar {
+    margin-left: 5px;
+}
+
+.fc-today-button.fc-button.fc-button {
+    border-radius: 15px;
+    background-color: #4987ab;
+    border: none;
+    color: #06030c;
+}
+/*Kalender button css styling slutt */
+/* Styling sliding toggle button */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 28px;
+}
+
+.switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #659dbd;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #659dbd;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(21px);
+    -ms-transform: translateX(21px);
+    transform: translateX(21px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 28px;
+}
+
+.slider.round:before {
+        border-radius: 50%;
+}
+
+label[for="toggleFilterBtnCheckbox"] {
+    font-size: 20px;
+}
+
+/*Slider slutt*/
+
+/* Button styling */
+.buttonStyle {
+    margin-bottom: 20px;
+    background-color: #659DBD;
+    border-radius: 25px;
+    border: none;
+    width: 120px;
+    height: 30px;
+    text-align: center;
+    color: #06030c;
+    justify-content:center;
+}
 
