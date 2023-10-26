@@ -48,29 +48,36 @@ public class ItemRepository : IItemRepository
 
     }
 
-    //Same method as in the demo from module 6, createas a listing to the database.
+    //Same method as in module 6, but added in the image logic so that users can add multiple images/pictures
     public async Task<bool> Create(Listing listing, List<IFormFile> Images)
     {
         try
         {
+            //Makes a new list
             var images = new List<Image>();
 
+            //Loops through for each images added
             foreach (var imageFile in Images)
             {
+                //Checks that there is a image
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    //Generates unique name, so that we dont have naming conflicts
+                    var fileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    //Gets the path
+                    var folder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    //The full path with the image name that should be stored
+                    var filePath = Path.Combine(folder, fileName);
 
+                    //Adds image to the uploads folder
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await imageFile.CopyToAsync(fileStream);
                     }
-
+                    //Adds the information to the image database
                     var image = new Image
                     {
-                        FilePath = "/uploads/" + uniqueFileName,
+                        FilePath = "/uploads/" + fileName,
                         ListingId = listing.Id
                     };
 
@@ -103,30 +110,92 @@ public class ItemRepository : IItemRepository
         }
     }
 
-
-
-    //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
-    public async Task<bool> Update(Listing listing)
+    //Action used for deleting images, used in the edit and delete methods for the listings/images
+    public async Task<bool> DeleteImage(int Id)
     {
         try
         {
-            var existingListing = await _db.Listings.FirstOrDefaultAsync(l => l.Id == listing.Id);
-            if (existingListing == null)
+            //FInds the images associated with the listing
+            var image = await _db.Images.FindAsync(Id);
+            if (image != null)
             {
-                return false;
+                //Finds the fullpath to the folder
+                var folder = Path.Combine(_webHostEnvironment.WebRootPath);
+                //Combines the path to the folder with the image and deletes it from the folder.
+                File.Delete(folder + image.FilePath);
+
+                //Removes the picture from the database.
+                _db.Images.Remove(image);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[ItemRepository] failed to delete the image, error message: {e}", e.Message);
+            return false;
+        }
+    }
+
+
+    //Modified the method from the module as i was getting detach issues when updating, similar to the delete method.
+    public async Task<bool> Update(Listing existingListing, Listing updatedListing, List<IFormFile> newImages, int? imageToDeleteId)
+    {
+        try
+        {
+            //If the delete button is used
+            if (imageToDeleteId.HasValue)
+            {
+                existingListing.EndDate = updatedListing.EndDate;
+                //Calls the deleteImage method
+                var imageDeleted = await DeleteImage(imageToDeleteId.Value);
+                if (!imageDeleted)
+                {
+                    return false;
+                }
+            }
+
+            // Handle image upload, same as the create method
+            var imagesToAdd = new List<Image>();
+            foreach (var imageFile in newImages)
+            {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+
+                    var fileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    var folder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    var filePath = Path.Combine(folder, fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    var image = new Image
+                    {
+                        FilePath = "/uploads/" + fileName,
+                        ListingId = existingListing.Id
+                    };
+
+                    imagesToAdd.Add(image);
+                }
             }
 
             // Update the properties of the existing listing with the new values
-            existingListing.Name = listing.Name;
-            existingListing.Place = listing.Place;
-            existingListing.Description = listing.Description;
-            existingListing.Type = listing.Type;
-            existingListing.Price = listing.Price;
-            existingListing.Guests = listing.Guests;
-            existingListing.Bedrooms = listing.Bedrooms;
-            existingListing.Bathrooms = listing.Bathrooms;
-            existingListing.StartDate = listing.StartDate;
-            existingListing.EndDate = listing.EndDate;
+            existingListing.Name = updatedListing.Name;
+            existingListing.Place = updatedListing.Place;
+            existingListing.Description = updatedListing.Description;
+            existingListing.Type = updatedListing.Type;
+            existingListing.Price = updatedListing.Price;
+            existingListing.Guests = updatedListing.Guests;
+            existingListing.Bedrooms = updatedListing.Bedrooms;
+            existingListing.Bathrooms = updatedListing.Bathrooms;
+            existingListing.StartDate = updatedListing.StartDate;
+            existingListing.EndDate = updatedListing.EndDate;
+
+            // Add new images
+            existingListing.Images.AddRange(imagesToAdd);
 
             // Save the changes to the database
             await _db.SaveChangesAsync();
@@ -135,74 +204,14 @@ public class ItemRepository : IItemRepository
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] failed to update the listing {@listing}, error message: {e}", listing, e.Message);
-            return false;
-        }
-    }
-
-    public async Task<bool> ManageImages(Listing listing, List<IFormFile> newImages, int? imageToDeleteId)
-    {
-        try
-        {
-            var existingListing = await _db.Listings.Include(l => l.Images).FirstOrDefaultAsync(l => l.Id == listing.Id);
-            if (existingListing == null)
-            {
-                return false;
-            }
-
-            if (imageToDeleteId.HasValue)
-            {
-                // Delete image
-                var imageToDelete = existingListing.Images.FirstOrDefault(img => img.Id == imageToDeleteId);
-                if (imageToDelete != null)
-                {
-                    existingListing.Images.Remove(imageToDelete);
-                }
-            }
-
-            if (newImages != null && newImages.Count > 0)
-            {
-                // Handle image upload
-                var imagesToAdd = new List<Image>();
-
-                foreach (var imageFile in newImages)
-                {
-                    if (imageFile != null && imageFile.Length > 0)
-                    {
-                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await imageFile.CopyToAsync(fileStream);
-                        }
-
-                        var image = new Image
-                        {
-                            FilePath = "/uploads/" + uniqueFileName,
-                            ListingId = existingListing.Id
-                        };
-
-                        imagesToAdd.Add(image);
-                    }
-                }
-
-                existingListing.Images.AddRange(imagesToAdd);
-            }
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("[ItemRepository] failed to manage images for listing ID {ListingId:0000}, error message: {e}", listing.Id, e.Message);
+            _logger.LogError("[ItemRepository] failed to update the listing and images, error message: {e}", e.Message);
             return false;
         }
     }
 
 
 
+    //Delete method, same as in module 6, but added the DeleteImage method to delete the images
     public async Task<bool> Delete(int id)
     {
         try
@@ -217,18 +226,12 @@ public class ItemRepository : IItemRepository
 
             // Gets images based on the listing id
             var images = await GetImagesByListingId(id);
-            //Gets the fullpath
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath);
-            // Goes through all files belonging to the listing
+
             foreach (var image in images)
             {
-                //Deletes files
-                File.Delete(uploadsFolder + image.FilePath);
-                
+                // Delete the image using the DeleteImage method
+                await DeleteImage(image.Id);
             }
-
-            // Remove the images from the database
-            _db.Images.RemoveRange(images);
 
             // Remove the listing
             _db.Listings.Remove(listing);
@@ -242,6 +245,7 @@ public class ItemRepository : IItemRepository
             return false;
         }
     }
+
 
 
     //Method to get a listing by userId, used to show only show a user their listings
@@ -275,11 +279,12 @@ public class ItemRepository : IItemRepository
         }
 
     }
+    //Method to get images based on the listind id
     public async Task<IEnumerable<Image>> GetImagesByListingId(int listingId)
     {
         try
         {
-            // Use EF Core to query the Images with the specified ListingId
+            // lambda expressioon to fetch Images with the specified ListingId
             return await _db.Images.Where(i => i.ListingId == listingId).ToListAsync();
         }
         catch (Exception e)
@@ -289,35 +294,42 @@ public class ItemRepository : IItemRepository
         }
     }
 
-
-    //Creates a reservation
+    // IItemRepository
     public async Task<bool> CreateReservation(Reservation reservation)
     {
         try
         {
-            // Check if the listing is available between the specified dayes. Checks both the reservation and listing databases if the dates are in the reservations database, or are not in the listing.
+            // Check if the listing is available between the specified dates. 
             bool isAvailable = !_db.Reservations.Any(r =>
                 r.ListingId == reservation.ListingId &&
                 ((reservation.StartDate >= r.StartDate && reservation.StartDate <= r.EndDate) ||
                  (reservation.EndDate >= r.StartDate && reservation.EndDate <= r.EndDate)));
-            //If available adds the reservation to the database
+
             if (isAvailable)
             {
-                _db.Reservations.Add(reservation);
-                await _db.SaveChangesAsync();
-                return true;
+                // Retrieve the associated listing
+                var listing = await _db.Listings.FindAsync(reservation.ListingId);
+
+                if (listing != null)
+                {
+                    // Set the 'Place' for the reservation based on the listing
+                    reservation.Place = listing.Place;
+
+                    _db.Reservations.Add(reservation);
+                    await _db.SaveChangesAsync();
+                    return true;
+                }
             }
-            else
-            {
-                return false; // Reservation not available
-            }
+
+            return false; // Reservation not available or listing not found
         }
         catch (Exception e)
         {
-            _logger.LogError("[ItemRepository] reservation creation failed for reservation {@reservation}, error message: {e}", reservation, e.Message);
+            _logger.LogError("[ItemRepository] reservation creation failed, error message: {e}", e.Message);
             return false;
         }
     }
+
     //Checks if the startdate is after todays date
     public bool DateCheck(DateTime startDate)
     {
@@ -329,7 +341,6 @@ public class ItemRepository : IItemRepository
     {
         return startDate.Date <= endDate.Date;
     }
-
 
     //Adds filters so that the user can filter their view.
     public async Task<IEnumerable<Listing>?> FilterListings(String? Place, int? AmountGuests, int? AmountBathrooms, int? AmountBedrooms, int? MinPrice, int? MaxPrice, DateTime? StartDate, DateTime? EndDate)

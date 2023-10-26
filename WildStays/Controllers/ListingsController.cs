@@ -11,12 +11,15 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using WildStays.Migrations;
 
 namespace WildStays.Controllers
 {
     public class ListingsController : Controller
     {
         private readonly IItemRepository _itemRepository;
+
+        //Adds logging as in the modules.
         private readonly ILogger<ListingsController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -101,22 +104,18 @@ namespace WildStays.Controllers
                     return View(listing);
                 }
 
-                //Set User Id, as this is not a field in the form
+                //Set User Id
                 listing.UserId = user.Id;
                 // Create the listing
                 bool returnOk = await _itemRepository.Create(listing, Images);
-
-
                 if (returnOk)
                 {
                     _logger.LogDebug("Image url", Images);
                     return RedirectToAction(nameof(Index));
                 }
             }
-
             return View(listing);
         }
-
 
         // GET: Listings/Edit/5
         [Authorize]
@@ -137,116 +136,66 @@ namespace WildStays.Controllers
             return View(listing);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> Edit(int id, Listing listing, List<IFormFile> Images, string submit)
-        {
-            if (id != listing.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                var existingListing = await _itemRepository.GetItemById(listing.Id);
-
-                if (existingListing == null || existingListing.UserId != user.Id)
-                {
-                    return Forbid();
-                }
-
-                // Update the UserId to ensure it matches the current user
-                listing.UserId = user.Id;
-
-                if (submit == "Save")
-                {
-                    // Update listing details (without images)
-                    if (await _itemRepository.Update(listing))
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = "Failed to update the listing. Please try again later.";
-                    }
-                }
-                else if (submit == "ManageImages")
-                {
-                    // Redirect to the image management view with the listing ID
-                    return RedirectToAction("ManageImages", new { id = listing.Id });
-                }
-            }
-
-            return View(listing);
-        }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> ManageImages(int id, Listing listing, List<IFormFile> Images, int? deleteImage, string saveImages)
+        public async Task<IActionResult> Edit(int id, Listing listing, List<IFormFile> Images, int? deleteImage, string submit)
         {
-            _logger.LogInformation("Entering ManageImages action for listing ID: {ListingId}", id);
-
+            //If the listing is not found
             if (id != listing.Id)
             {
-                _logger.LogWarning("Invalid ID: {ListingId}. Returning NotFound.", id);
+                _logger.LogWarning("Wrong ID: {ListingId}. Returning NotFound.", id);
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
+            //Gets the listings by the listing.id
             var existingListing = await _itemRepository.GetItemById(listing.Id);
 
             if (existingListing == null || existingListing.UserId != user.Id)
             {
-                _logger.LogWarning("Unauthorized access to ManageImages for listing ID: {ListingId}. Returning Forbid.", id);
+                _logger.LogWarning("This listing is not available listing ID: {ListingId}. Returning Forbid.", id);
                 return Forbid();
             }
 
             try
             {
-                if (!string.IsNullOrEmpty(saveImages))
+                //If the delete image button is tapped
+                if (deleteImage.HasValue)
                 {
-                    // User clicked "Save Images" button
-                    var result = await _itemRepository.ManageImages(existingListing, Images, null);
+                    // Delete the image
+                    bool imageDeleted = await _itemRepository.DeleteImage(deleteImage.Value);
+
+                }
+
+                if (ModelState.IsValid)
+                {
+
+                    // Update the UserId so that it matches.
+                    listing.UserId = user.Id;
+
+                    var result = await _itemRepository.Update(existingListing, listing, Images, null); // Pass null for imageToDeleteId
 
                     if (result)
                     {
-                        _logger.LogInformation("Images saved successfully for listing ID: {ListingId}. Redirecting to Edit.", id);
+                        _logger.LogInformation("Listing details and images updated successfully for listing ID: {ListingId}. Redirecting to Edit.", id);
                         return RedirectToAction("Edit", new { id = existingListing.Id });
                     }
                     else
                     {
-                        _logger.LogError("Failed to save images for listing ID: {ListingId}.");
-                    }
-                }
-                else if (deleteImage.HasValue)
-                {
-                    // User clicked "Delete" button for an image
-                    var result = await _itemRepository.ManageImages(existingListing, null, deleteImage);
-
-                    if (result)
-                    {
-                        _logger.LogInformation("Image deleted successfully for listing ID: {ListingId}. Redirecting to ManageImages.", id);
-                        return RedirectToAction("ManageImages", new { id = existingListing.Id });
-                    }
-                    else
-                    {
-                        _logger.LogError("Failed to delete image for listing ID: {ListingId}.");
+                        _logger.LogError("Failed to update listing and images for listing ID: {ListingId}.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred in ManageImages for listing ID: {ListingId}.", id);
+                _logger.LogError(ex, "An error occurred in Edit for listing ID: {ListingId}.", id);
             }
-
-            _logger.LogInformation("Exiting ManageImages action for listing ID: {ListingId}", id);
-
             return View(existingListing);
         }
+
+
 
 
 
@@ -268,6 +217,8 @@ namespace WildStays.Controllers
 
             return View(listing);
         }
+
+
 
         // POST: Listings/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -301,7 +252,6 @@ namespace WildStays.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
 
 
         // GET: Listings/MyReservations
