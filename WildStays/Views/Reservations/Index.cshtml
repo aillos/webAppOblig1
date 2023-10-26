@@ -1,201 +1,285 @@
 @model IEnumerable<WildStays.Models.Listing>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('#toggleFilterBtnCheckbox').change(function () {
-                $('#filterFormContainer').toggle(); // Toggles the visibility of the form
-            });
-        });
-    </script>
-}
+@inject WildStays.DAL.IItemRepository _itemRepository
+
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>
+
+<!-- JQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Javascript for switch -->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#toggleFilterBtnCheckbox').change(function () {
+                $('#filterFormContainer').toggle();
+            });
+        });
+    </script>
+}
+
+<!-- Css styling -->
+<style>
+    .row {
+        grid-column-gap: 15px;
+        grid-row-gap: 30px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .col {
+        max-width: 350px;
+    }
+
+    .roundedImage {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 10px;
+        position: relative;
+        width: 250px;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    .card {
+        background-color: lightgrey;
+        padding: 20px;
+        min-width: 280px;
+    }
+
+    h1 {
+        padding-bottom: 30px;
+    }
+
+    .text-left {
+        float: left;
+    }
+
+    .text-right {
+        float: right;
+    }
+
+    .carousel-indicators [data-bs-target] {
+        border-radius: 100%;
+        width: 15px;
+        height: 15px;
+    }
+
+    .carousel-item {
+        height: 280px;
+    }
+
+    .carousel-control-prev {
+        left: -20px;
+        top: -15px;
+    }
+
+    .carousel-control-next {
+        right: -20px;
+        top: -15px;
+    }
+
+</style>
+
+<!-- Switch to toggle filters on or off -->
 <label class="switch">
     <input type="checkbox" id="toggleFilterBtnCheckbox">
     <span class="slider round"></span>
 
 </label>
 <label for="toggleFilterBtnCheckbox">Toggle Filter</label>
+
+<!-- Form containing filters -->
 <div id="filterFormContainer" style="display: none;">
-<form asp-action="Index" method="get">
-    <div class="form-group">
-        <label for="Place">Filter by Place:</label>
-        <select name="Place" class="form-control">
-            <option value="">All</option>
-            <option value="Oslo">Oslo</option>
-            <option value="Bergen">Bergen</option>
-            <option value="Trondheim">Trondheim</option>
-        </select>
-        <label for="AmountPeople">Filter by Number of Guests:</label>
-        <select name="AmountPeople" class="form-control">
-            <option value="">All</option>
-            <option value="1">1 or more</option>
-            <option value="2">2 or more</option>
-            <option value="3">3 or more</option>
-            <option value="4">4 or more</option>
-            <option value="5">5 or more</option>
-            <option value="6">6 or more</option>
-            <option value="7">7 or more</option>
-            <option value="8">8 or more</option>
-            <option value="9">9 or more</option>
-            <option value="10">10 or more</option>
-            <option value="11">11 or more</option>
-            <option value="12">12 or more</option>
-            <option value="13">13 or more</option>
-            <option value="14">14 or more</option>
-            <option value="15">15 or more</option>
-            <option value="16">16 or more</option>
-            <option value="17">17 or more</option>
-            <option value="18">18 or more</option>
-            <option value="19">19 or more</option>
-            <option value="20">20 or more</option>
-        </select>
+    <form asp-action="Index" method="get">
+        <div class="form-group">
+            <label for="Place">Filter by Place:</label>
+            <select name="Place" class="form-control">
+                <option value="">All</option>
+                <option value="Oslo">Oslo</option>
+                <option value="Bergen">Bergen</option>
+                <option value="Trondheim">Trondheim</option>
+            </select>
+            <label for="AmountGuests">Filter by Number of Guests:</label>
+            <select name="AmountGuests" class="form-control">
+                <option value="">All</option>
+                <option value="1">1 or more</option>
+                <option value="2">2 or more</option>
+                <option value="3">3 or more</option>
+                <option value="4">4 or more</option>
+                <option value="5">5 or more</option>
+                <option value="6">6 or more</option>
+                <option value="7">7 or more</option>
+                <option value="8">8 or more</option>
+                <option value="9">9 or more</option>
+                <option value="10">10 or more</option>
+                <option value="11">11 or more</option>
+                <option value="12">12 or more</option>
+                <option value="13">13 or more</option>
+                <option value="14">14 or more</option>
+                <option value="15">15 or more</option>
+                <option value="16">16 or more</option>
+                <option value="17">17 or more</option>
+                <option value="18">18 or more</option>
+                <option value="19">19 or more</option>
+                <option value="20">20 or more</option>
+            </select>
 
-        <label for="AmountBathrooms">Filter by Number of Bathrooms:</label>
-        <select name="AmountBathrooms" class="form-control">
-            <option value="">All</option>
-            <option value="1">1 or more</option>
-            <option value="2">2 or more</option>
-            <option value="3">3 or more</option>
-            <option value="4">4 or more</option>
-            <option value="5">5 or more</option>
-            <option value="6">6 or more</option>
-            <option value="7">7 or more</option>
-            <option value="8">8 or more</option>
-            <option value="9">9 or more</option>
-            <option value="10">10 or more</option>
-            <option value="11">11 or more</option>
-            <option value="12">12 or more</option>
-            <option value="13">13 or more</option>
-            <option value="14">14 or more</option>
-            <option value="15">15 or more</option>
-            <option value="16">16 or more</option>
-            <option value="17">17 or more</option>
-            <option value="18">18 or more</option>
-            <option value="19">19 or more</option>
-            <option value="20">20 or more</option>
-        </select>
+            <label for="AmountBathrooms">Filter by Number of Bathrooms:</label>
+            <select name="AmountBathrooms" class="form-control">
+                <option value="">All</option>
+                <option value="1">1 or more</option>
+                <option value="2">2 or more</option>
+                <option value="3">3 or more</option>
+                <option value="4">4 or more</option>
+                <option value="5">5 or more</option>
+                <option value="6">6 or more</option>
+                <option value="7">7 or more</option>
+                <option value="8">8 or more</option>
+                <option value="9">9 or more</option>
+                <option value="10">10 or more</option>
+                <option value="11">11 or more</option>
+                <option value="12">12 or more</option>
+                <option value="13">13 or more</option>
+                <option value="14">14 or more</option>
+                <option value="15">15 or more</option>
+                <option value="16">16 or more</option>
+                <option value="17">17 or more</option>
+                <option value="18">18 or more</option>
+                <option value="19">19 or more</option>
+                <option value="20">20 or more</option>
+            </select>
 
-        <label for="AmountBedrooms">Filter by Number of Bedrooms:</label>
-        <select name="AmountBedrooms" class="form-control">
-            <option value="">All</option>
-            <option value="1">1 or more</option>
-            <option value="2">2 or more</option>
-            <option value="3">3 or more</option>
-            <option value="4">4 or more</option>
-            <option value="5">5 or more</option>
-            <option value="6">6 or more</option>
-            <option value="7">7 or more</option>
-            <option value="8">8 or more</option>
-            <option value="9">9 or more</option>
-            <option value="10">10 or more</option>
-            <option value="11">11 or more</option>
-            <option value="12">12 or more</option>
-            <option value="13">13 or more</option>
-            <option value="14">14 or more</option>
-            <option value="15">15 or more</option>
-            <option value="16">16 or more</option>
-            <option value="17">17 or more</option>
-            <option value="18">18 or more</option>
-            <option value="19">19 or more</option>
-            <option value="20">20 or more</option>
-        </select>
-        <p>
-            Filter by minimum price: <input type="text" name="MinPrice" value="@ViewData["CurrentFilter"]" />
-        </p>
-        <p>
-            Filter by maximum price: <input type="text" name="MaxPrice" value="@ViewData["CurrentFilter"]" />
-        </p>
-        <p>
-            Filter by Start Date: <input type="date" name="StartDate" value="@ViewData["StartDateFilter"]" />
-        </p>
-        <p>
-            Filter by End Date: <input type="date" name="EndDate" value="@ViewData["EndDateFilter"]" />
-        </p>
-
-
-
-    </div>
-    <button type="submit" class="buttonStyle">Apply Filter</button>
-</form>
+            <label for="AmountBedrooms">Filter by Number of Bedrooms:</label>
+            <select name="AmountBedrooms" class="form-control">
+                <option value="">All</option>
+                <option value="1">1 or more</option>
+                <option value="2">2 or more</option>
+                <option value="3">3 or more</option>
+                <option value="4">4 or more</option>
+                <option value="5">5 or more</option>
+                <option value="6">6 or more</option>
+                <option value="7">7 or more</option>
+                <option value="8">8 or more</option>
+                <option value="9">9 or more</option>
+                <option value="10">10 or more</option>
+                <option value="11">11 or more</option>
+                <option value="12">12 or more</option>
+                <option value="13">13 or more</option>
+                <option value="14">14 or more</option>
+                <option value="15">15 or more</option>
+                <option value="16">16 or more</option>
+                <option value="17">17 or more</option>
+                <option value="18">18 or more</option>
+                <option value="19">19 or more</option>
+                <option value="20">20 or more</option>
+            </select>
+            <p>
+                Filter by minimum price: <input type="text" name="MinPrice" value="@ViewData["CurrentFilter"]" />
+            </p>
+            <p>
+                Filter by maximum price: <input type="text" name="MaxPrice" value="@ViewData["CurrentFilter"]" />
+            </p>
+            <p>
+                Filter by Start Date: <input type="date" name="StartDate" value="@ViewData["StartDateFilter"]" />
+            </p>
+            <p>
+                Filter by End Date: <input type="date" name="EndDate" value="@ViewData["EndDateFilter"]" />
+            </p>
+        </div>
+        <button type="submit" class="buttonStyle">Apply Filter</button>
+    </form>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Place)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Guests)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Bedrooms)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Bathrooms)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Images)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Place)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Guests)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Bedrooms)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Bathrooms)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Images)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
 
-                </td>
-            </tr>
-        }
-       
+<h1>Listings of available housing</h1>
 
-    </tbody>
-</table>
-
+<!-- Code to show the listings in a grid -->
+<div class="row">
+    <!-- A foreach loop which loops through all the listings and displays them in a grid -->
+    @foreach (var listing in Model)
+    {
+        <div class="col">
+            <div class="card">
+                <!-- Creates the image carousel using bootstrap classes -->
+                <div id="@("listing"+listing.Id)" class="carousel slide" data-bs-interval="false">
+                    <!-- Redirects to the details view of the listing when clicking on the image -->
+                    <a asp-action="Details"
+                       asp-route-id="@listing.Id">
+                        <!-- Carousel inner where the slides are created -->
+                        <div class="carousel-inner">
+                            @{
+                                // A counter used in the loop to create a carousel slide for each image
+                                int count = 0;
+                            }
+                            <!-- A foreach loops which loops through every image in the listing -->
+                            @foreach (var image in await _itemRepository.GetImagesByListingId(listing.Id))
+                            {
+                                // Creates a slide with the current image in the loop
+                                // If it is the first image, the counter will be 0 and the slide will be set a active
+                                // This is necessary for the image carousel to work
+                                <div class="carousel-item @(count == 0 ? "active" : "")">
+                                    <!-- roundedImage is styled to be a circular image -->
+                                    <img src="@image.FilePath" class="roundedImage" alt="Image @(count + 1)">
+                                </div>
+                                // Increcemt on count
+                                count++;
+                            }
+                        </div>
+                    </a>
+                    <!-- Prev and next controllers for the carousel -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#@("listing" + listing.Id)" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <!-- Text containing info on the listing -->
+                <div class="row">
+                    <div class="text-center">
+                        <h3>
+                            @listing.Name
+                        </h3>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-left">
+                        <h5>
+                            @listing.Place
+                        </h5>
+                        <h5>
+                            @listing.Guests GUEST(S)
+                        </h5>
+                    </div>
+                    <div class="text-right">
+                        <h5>
+                            @listing.Type
+                        </h5>
+                        <h5>
+                            @listing.Price.ToString("0.00 NOK")
+                        </h5>
+                    </div>
+                </div>
+                <!-- Additional redirect to the details view -->
+                <div class="row">
+                    <div class="text-center">
+                        <a asp-action="Details"
+                           asp-route-id="@listing.Id">Go to listing</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

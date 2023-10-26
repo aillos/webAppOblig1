@@ -1,42 +1,50 @@
 @model ListingDetailsViewModel
+@inject WildStays.DAL.IItemRepository _itemRepository
 
 @{
     ViewData["Title"] = "Details";
 }
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
 <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.css' />
 <link rel="stylesheet" href="./css/site.css">
-<h1>Details</h1>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Fetching events from reservations.
         var allEvents = @Html.Raw(Json.Serialize(Model.Reservations.Select(item => new {
-            title="BOOKED", 
+            title="BOOKED",
             start = item.StartDate.ToString("yyyy-MM-dd"),
             end = item.EndDate.AddDays(1).ToString("yyyy-MM-dd"),
             display = "background",
             color = "#B22222",
-        })));
-    
+            })));
+
         // Calendar settings.
         var calendarEl = document.getElementById('calendar2');
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            eventDidMount: function(info) {
-                    if (info.event.display === 'background') {
-                        $(info.el).css('opacity', '0.8');  
-                    }
-                },
+            eventDidMount: function (info) {
+                if (info.event.display === 'background') {
+                    $(info.el).css('opacity', '0.8');
+                }
+            },
             initialView: 'dayGridMonth',
             fixedWeekCount: false,
             timeFormat: 'H(:mm)',
             displayEventTime: false,
-            selectable: true, 
+            selectable: true,
             unselect: function () {
                 var datesDiv = document.getElementById('dates');
                 datesDiv.innerHTML = '';
             },
-    
+
             // If a reserved date is selected, notify the user.
             select: function (info) {
                 var eventsDuringSelection = calendar.getEvents().filter(event => {
@@ -44,7 +52,7 @@
                     var eventEnd = new Date(event.end);
                     return eventStart < info.end && eventEnd > info.start && event.backgroundColor === 'red';
                 });
-                
+
                 if (eventsDuringSelection.length === 0) {
                     document.getElementById('StartDate').value = info.startStr;
                     document.getElementById('EndDate').value = info.endStr;
@@ -53,83 +61,151 @@
                 }
             }
         });
-                allEvents.forEach(event => {
-                    calendar.addEvent(event);
-                });
-    
+        allEvents.forEach(event => {
+            calendar.addEvent(event);
+        });
+
         // Render the calendar.
         calendar.render();
-       
+
         // Add all the reservations to the calendar.
 
     });
 
 </script>
-<div>
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
+
+<!-- Css for styling -->
+<style>
+    .image {
+        margin: auto;
+        padding-bottom: 30px;
+        min-height: 430px;
     }
-    <h4>Listing</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Type)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Type)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Price)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Guests)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Guests)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Bedrooms)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Bedrooms)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Listing.Bathrooms)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Listing.Bathrooms)
-        </dd>
-    </dl>
+
+    .adjustImage {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 400px;
+    }
+
+    .row {
+        background-color: lightgray;
+        outline: 1px solid black;
+    }
+
+    .carousel-indicators [data-bs-target] {
+        border-radius: 100%;
+        width: 15px;
+        height: 15px;
+    }
+
+</style>
+
+<!-- Button to go back to the grid view of the listings -->
+<p><a href="/Reservations" class="btn btn-danger">Back to reservations</a></p>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="text-center">
+    <h1>@Model.Listing.Name</h1>
 </div>
 
-<div id="calendar2"></div>
+<!-- Div containing the image carousel -->
+<div class="image">
+    <!-- Creates the image carousel using bootstrap classes -->
+    <div id="carouselDetails" class="carousel slide" data-bs-interval="false">
+        <!-- Creates carousel indicators which scales with the amount of images in the listing -->
+        <div class="carousel-indicators">
+            @{
+                // Indicator counter, used in the loop which creates the indicators
+                int iCount = 0;
+            }
+            <!-- Foreach loop which loops through the images and creates an indicator corresponding to each image -->
+            @foreach (var image in await _itemRepository.GetImagesByListingId(Model.Listing.Id))
+            {
+            // The indicator is added, and is set to slide to the count value
+                // The class is set as active if iCount == 0
+                // This is necessary for the carousel to work
+                <button type="button" data-bs-target="#carouselDetails" data-bs-slide-to="@iCount" class="@(iCount == 0 ? "active" : "")"></button>
+                // Increment on iCount
+                iCount++;
+            }
+        </div>
+        @{
+            // A counter used in the loop to create a carousel slide for each image
+            int count = 0;
+        }
+        <!-- A foreach loops which loops through every image in the listing -->
+        <div class="carousel-inner">
+            @foreach (var image in await _itemRepository.GetImagesByListingId(Model.Listing.Id))
+            {
+                // Creates a slide with the current image in the loop
+                // If it is the first image, the counter will be 0 and the slide will be set a active
+                // This is necessary for the image carousel to work
+                <div class="carousel-item @(count == 0 ? "active" : "")">
+                    <!-- adjustImage is used to adjust the images so they are all the same height-->
+                    <img src="@image.FilePath" class="adjustImage" alt="Image @(count + 1)">
+                </div>
+                // Increment on count
+                count++;
+            }
+        </div>
+        <!-- Prev and next controller for the carousel -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselDetails" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselDetails" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<!-- Information on the listing using variables from the model -->
+<div class="row">
+    <div class="col">
+        <h5>PRICE:</h5>
+        <p>@Model.Listing.Price.ToString("0.00 NOK")</p>
+    </div>
+    <div class="col">
+        <h5>LOCATION:</h5>
+        <p>@Model.Listing.Place</p>
+    </div>
+    <div class="col">
+        <h5>TYPE:</h5>
+        <p>@Model.Listing.Type</p>
+    </div>
+    <div class="col">
+        <h5>GUESTS:</h5>
+        <p>@Model.Listing.Guests</p>
+    </div>
+    <div class="col">
+        <h5>BEDROOMS:</h5>
+        <p>@Model.Listing.Bedrooms</p>
+    </div>
+    <div class="col">
+        <h5>BATHROOMS:</h5>
+        <p>@Model.Listing.Bathrooms</p>
+    </div>
+</div>
+<div class="row">
+    <h5>DESCRIPTION:</h5>
+    <p>@Model.Listing.Description</p>
+</div>
+
 <h2>Make a Reservation</h2>
+<div id="calendar2"></div>
 <form asp-action="CreateReservation" method="post">
     <input type="hidden" name="listingId" value="@Model.Listing.Id" />
     <input type="hidden" name="place" value="@Model.Listing.Place" />
-        <input type="hidden" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
-        <input type="hidden" id="EndDate" name="EndDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+    <input type="hidden" id="StartDate" name="StartDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+    <input type="hidden" id="EndDate" name="EndDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
     <button type="submit" class="buttonStyle">Reserve</button>
 </form>
-<div>
-
-    <a asp-action="Index">Back to List</a>
-</div>

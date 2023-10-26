@@ -40,8 +40,6 @@ namespace WildStays.Controllers
         }
 
 
-
-
         // Detail action, same as in listingscontroller, but has reservations in it
         public async Task<IActionResult> Details(int id)
      {
