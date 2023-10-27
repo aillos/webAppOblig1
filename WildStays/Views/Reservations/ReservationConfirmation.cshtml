@@ -39,7 +39,8 @@
         </div>
     </div>
 </div>
-<form action="/" method="get">
-    <button type="submit" class="w-75 h-50 btn buttonStyle">Back to Home</button>
+<form method="post" asp-action="ReservationBooked">
+    <button type="submit" class="btn btn-primary">Confirm Reservation</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 

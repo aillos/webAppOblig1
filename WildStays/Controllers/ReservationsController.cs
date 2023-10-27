@@ -60,6 +60,10 @@ namespace WildStays.Controllers
          return View(viewModel);
      }
 
+        public async Task<IActionResult> ReservationBooked()
+        {
+            return View("ReservationBooked");
+        }
         
 
         // Creates a reservation
