@@ -5,7 +5,7 @@
 }
 
 <div class="container">
-    <h2>Reservation Confirmation</h2>
+    <h2>We have recieved your reservation</h2>
     <div class="row">
         <div class="col-md-6">
             <h4>Listing Information</h4>
@@ -39,8 +39,7 @@
         </div>
     </div>
 </div>
-<form method="post" asp-action="ConfirmReservation">
-    <button type="submit" class="btn btn-primary">Confirm Reservation</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+<form action="/" method="get">
+    <button type="submit" class="w-75 h-50 btn buttonStyle">Back to Home</button>
 </form>
 
