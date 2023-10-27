@@ -1,6 +1,7 @@
 html {
     font-size: 14px;
     color: #06030c;
+    background: #E8E3F8;
 }
 
 @media (min-width: 768px) {
@@ -18,8 +19,9 @@ html {
 body {
     margin-bottom: 60px;
     color: #06030c;
+    background: #E8E3F8;
 }
-/*Søkefelt styling start */
+/*Search styling start */
 #searchButton {
     border-radius: 15px;
     border: none;
@@ -62,12 +64,12 @@ body {
     border-radius: 15px;
     padding: 2px 5px;
     height: 30px;
-    background-color: #f5f5f5;
+    background-color: #E8E3F8;
     border: 1px solid #ccc;
     flex:3;
     margin-left:10px;
 }
-/*Søkefelt styling slutt*/
+/*Search styling end*/
 
 /*Slideshow styling*/
 
@@ -79,7 +81,7 @@ body {
     justify-content: center;
     text-align: center;
     position: relative;
-    background-color:white;
+    background-color:#E8E3F8;
 }
 
 
@@ -128,9 +130,9 @@ body {
     background-color: rgb(40, 40, 40, 0.7);
 
 }
-/*Slideshow styling slutt*/
+/*Slideshow styling end*/
 
-/*Slideshow css logikk start*/
+/*Slideshow css logic start*/
 
 #slider-span1:target ~ .image-slider #img1,
 #slider-span1:target ~ .image-slider #button-1,
@@ -166,7 +168,7 @@ body {
 #slider-span5:target ~ .image-slider {
     left: -70%;
 }
-/*Slideshow css slutt*/
+/*Slideshow css end*/
 
 .dateDiv {
     display: flex;
@@ -175,7 +177,7 @@ body {
     justify-content: center;
 }
 
-/*Kalender styling*/
+/*Calendar styling*/
 #calendar {
     width: 400px;
     height: 300px;
@@ -183,7 +185,7 @@ body {
     border: 1px solid rgb(222,222,222,0.6);
     border-radius: 2%;
     margin-bottom: 20px;
-    background-color: white;
+    background-color: #E8E3F8;
     margin-top: -35px;
 }
 
@@ -194,7 +196,7 @@ body {
     border: 2px solid #111;
     border-radius: 2%;
     margin-bottom: 20px;
-    background-color: white;
+    background-color: #E8E3F8;
     margin-top: 10px;
 }
 
@@ -202,16 +204,16 @@ body {
 .calendarInfo{
     margin:-80px auto 45px auto;
     text-align:center;
-    background-color:white;
+    background-color:#E8E3F8;
     width:380px;
     height:38px;
     border-radius:25px;
     font-size:12px;
 }
 
-/*Valgte dato styling*/
+/*Chosen date styling*/
 #dates {
-    background-color: white;
+    background-color: #E8E3F8;
     border-radius: 15px;
     width: 350px;
     height: 30px;
@@ -221,7 +223,7 @@ body {
 }
 
 
-/*Kalender button css styling start */
+/*Calendar button css styling start */
 .fc-button.fc-next-button.fc-button-primary {
     background-color: #659DBD;
     border-color: #659DBD;
@@ -280,7 +282,7 @@ body {
     border: none;
     color: #06030c;
 }
-/*Kalender button css styling slutt */
+/*Calendar button css styling end */
 /* Styling sliding toggle button */
 .switch {
     position: relative;
@@ -346,7 +348,7 @@ label[for="toggleFilterBtnCheckbox"] {
     font-size: 20px;
 }
 
-/*Slider slutt*/
+/*Slider end*/
 
 /* Button styling */
 .buttonStyle {

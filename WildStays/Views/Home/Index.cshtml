@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="./css/site.css">
 <style>
     
-    /*Setter margin og padding til body til 0 for å unngå whiteline i bunnen og unødvendig scrolle mulighet.*/
+    /*Setting margin and padding for body to 0 to avoid whiteline at the bottom and unnsessecary scrolling.*/
     body{
     margin:0px;
     padding:0px;
@@ -16,7 +16,7 @@
         const searchButton = document.getElementById("searchButton");
         const textInput = document.getElementById("search");
         
-        //Henter ut events fra reservations (model).
+        //Retrieving events from reservations (model).
         var allEvents = @Html.Raw(Json.Serialize(Model.Select(item => new {
             title = "Listing: " + item.ListingId,
             start = item.StartDate.ToString("yyyy-MM-dd"),
@@ -26,7 +26,7 @@
             place = item.Place
             })));
 
-        //Instillinger for kalender, både layout, om den skal være mulig å trykke på, at tiden på dagen ikke skal vises osv.
+        //Settings for calendar, both layout and whether it should be possible to click on. And that the time of day should not be shown.
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
@@ -39,7 +39,7 @@
                 datesDiv.innerHTML = '';
             },
 
-            //Setter kalender events til bakgrunnsfarge rød så bruker vet at de er opptatt og kan inneholde færre alternativer ved søk.
+            //Setting calendar events to the backround color red, so user knows they are booked and may contain fewer options on search
             select: function (info) {
                 var eventsDuringSelection = calendar.getEvents().filter(event => {
                     var eventStart = new Date(event.start);
@@ -47,31 +47,31 @@
                     return eventStart < info.end && eventEnd > info.start && event.backgroundColor === 'red';
                 });
                 
-                //Dersom du ikke velger en reservert dato. Oppdaterer verdiene og oppdaterer dato feltet under kalenderen.
+                //If you select a date, updates the values and updates the date section under calendar
                 document.getElementById('startDateInput').value = info.startStr;
                 document.getElementById('endDateInput').value = info.endStr;
                 var datesDiv = document.getElementById('dates');
                 datesDiv.innerHTML = `Selected dates: ${info.startStr} to ${info.endStr}`;
                 
                 if (eventsDuringSelection.length !== 0) {
-                    //Dersom du velger en reservert dato, varsler isåfall om dette.
+                    //If you select a reserved date, then alert 
                     alert('Selection includes a reserved date!');
                 }
 
             }
         });
 
-        //Oppretter kalenderen
+        //Rendering the calendar
         calendar.render();
 
-        //Funksjon for å sjekke etter om søk blir foretatt.
+        //Function for checking if the search is being made.
         searchButton.addEventListener('click', () => {
             var searchTerm = textInput.value;
 
-            //Fjerner alle events før en setter nye. Tilfelle nytt søk. (Kunne vært en sjekk for om søk er samme eller ei evt, usikker på om det er mer effektivt eller ikke. Kommer nok veldig ann på antall reservasjoner)
+            //Removing all events before setting new ones, in case of a new search. There could be a check for if it's the same or not so that we could be more efficient, but that may be done for future versions. 
             calendar.removeAllEvents();
 
-            //Legger inn nye events basert på det nye søket.
+            //Adding new events based on search
             var filteredEvents = allEvents.filter(event => event.place === searchTerm);
 
             filteredEvents.forEach(event => {
@@ -91,7 +91,7 @@
 
 <div class="backgroundHome">
     <div class="background2">
-        @*Stedsinput hvor bruker putter inn sted for å kunne filtrere ut fra listings og reservations.*@
+        @*Place input where user puts in Place in order to filter out from liostings and reservations*@
         <div class="searchBar">
             <select id="search" name="Search">
                 <option value="">Select a Place</option>
@@ -99,23 +99,23 @@
                 <option value="Bergen">Bergen</option>
                 <option value="Trondheim">Trondheim</option>
             </select>
-            @*Utfører søk/oppdaterer kalenderen basert på stedsinnput*@
+            @*Performing search and updating calendar based on place input.*@
             <button id="searchButton">Search</button><br/>
         </div>
-        @*Info boks for bruk av kalenderen*@
+        @*Info container for use of calendar*@
         <div class="calendarInfo">The <strong style="color:red;">redder</strong> the date, the more listings are <strong>booked.</strong> <br /><strong>Click</strong> and <strong>drag</strong> to select dates to filter by.</div>
     </div>
     
-    @*Plassering av kalender på siden. Kalenderen er opprettet med Javascript som vist over*@
+    @*Placement of calendar on the site. Calendar is created with javascript as shown above.*@
     <div class="dateDiv">
         
         <div id="calendar"></div>
     </div>
-    @*Boks eller container for å vise hvilke datoer som er blitt valgt ut av bruker. Boksen oppdateres etterhvert som søk oppdateres.
-        Se listener i script over for mer info.*@
+    
+    @*Box or container to show which dates are being chosen by the user. Container is being updated as the search is made. See listener in script for more info.*@
     
     <div id="dates"></div>
-    @* Videresending til reservations siden med variabler satt basert på Place value (Sted), og StartDate/EndDate (Satt i kalender)*@
+    @* Redirection to reservations page with variables sett based on Place value and Start/End date.*@
     <form action="/Reservations" method="get">
         <input type="hidden" id="placeInput" name="Place" value="">
         <input type="hidden" id="startDateInput" name="StartDate" value="">
@@ -123,13 +123,12 @@
 
         <button type="submit" class="buttonStyle">See results</button>
     </form>
-
-    @* Bilde container, git white space for bildene over og under *@
+    
+    @*Image container, gives white space for the images below and above.*@
     <div class="bilder">
-        
-        @* Container for bilde slides, fungerer som slideshow, koden for slideshow er pur css ikke noe Javascript.
-            Hvert bilde er hentet fra mappen images. Dersom en ønsker flere bilder må også css oppdateres for å flytte korrekt avstand ved klikk.
-            For mer info se #slider-span1:target ~ .image-slider i css.*@
+        @*Container for image slides, works as a slideshow, image for slideshow is only css, no javascript.
+        Each image is selected from the folder images. If you wish more images, you need to update the css to move correct amount on click.
+        For more info see #slider-span1:targer ~ .image-slider in css.*@
         <div class="slide-container">
             <span class="slider-span" id="slider-span1"></span>
             <span class="slider-span" id="slider-span2"></span>
